@@ -1,0 +1,18 @@
+PROJECT_NAME           = "MTG Collection Manager"
+PROJECT_NUMBER         = 0.1.0
+OUTPUT_DIRECTORY       = docs
+INPUT                  = src-tauri/src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.rs
+EXTENSION_MAPPING      = rs=C++
+OPTIMIZE_OUTPUT_JAVA   = NO
+OPTIMIZE_OUTPUT_FOR_C  = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+HAVE_DOT               = NO
+UML_LOOK               = YES

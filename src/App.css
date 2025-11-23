@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-app-bg: #ffffff;
+  --color-sidebar-bg: #f3f4f6;
+  --color-accent-blue: #007AFF;
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-border-color: #e5e7eb;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: #1f2937;
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-accent-blue text-white rounded-md hover:bg-blue-600 transition-colors font-medium;
+  }
+
+  .sidebar-item {
+    @apply flex items-center px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-200 cursor-pointer transition-colors;
+  }
+
+  .sidebar-item.active {
+    @apply bg-gray-200 text-gray-900 font-medium;
+  }
+}
