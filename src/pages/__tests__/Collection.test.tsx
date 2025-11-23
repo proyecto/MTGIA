@@ -117,4 +117,47 @@ describe('Collection Page', () => {
         expect(screen.getByText('Delete Card')).toBeInTheDocument();
         expect(screen.getByText(/Are you sure you want to delete this card/)).toBeInTheDocument();
     });
+
+    it('opens card details modal on click', async () => {
+        const { invoke } = await import('@tauri-apps/api/core');
+        const mockScryfallCard = {
+            id: 'abc123',
+            name: 'Black Lotus',
+            set: 'lea',
+            set_name: 'Limited Edition Alpha',
+            collector_number: '232',
+            released_at: '1993-08-05',
+            rarity: 'rare',
+            image_uris: {
+                normal: 'https://example.com/image.jpg',
+            },
+            prices: {
+                usd: '1000.00',
+            },
+        };
+
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_collection') return Promise.resolve(mockCards);
+            if (cmd === 'get_card') return Promise.resolve(mockScryfallCard);
+            return Promise.resolve(undefined);
+        });
+
+        render(
+            <SettingsProvider>
+                <Collection />
+            </SettingsProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Black Lotus')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText('Black Lotus'));
+
+        await waitFor(() => {
+            expect(invoke).toHaveBeenCalledWith('get_card', { scryfallId: 'abc123' });
+            expect(screen.getByText('Card Details')).toBeInTheDocument();
+            expect(screen.getByText('Limited Edition Alpha')).toBeInTheDocument();
+        });
+    });
 });

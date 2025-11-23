@@ -4,8 +4,9 @@ import CardGrid from '../components/CardGrid';
 import CardItem from '../components/CardItem';
 import StatisticsModal from '../components/StatisticsModal';
 import EditCardModal from '../components/EditCardModal';
+import CardDetailsModal from '../components/CardDetailsModal';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { CollectionCard } from '../types';
+import { CollectionCard, ScryfallCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
 export default function Collection() {
@@ -19,6 +20,11 @@ export default function Collection() {
     const [cardToEdit, setCardToEdit] = useState<CollectionCard | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [cardToDelete, setCardToDelete] = useState<string | null>(null);
+
+    // Card Details Modal State
+    const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
+    const [selectedCollectionCard, setSelectedCollectionCard] = useState<CollectionCard | null>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     useEffect(() => {
         loadCollection();
@@ -67,6 +73,19 @@ export default function Collection() {
     function handleEditCard(card: CollectionCard) {
         setCardToEdit(card);
         setIsEditOpen(true);
+    }
+
+    async function handleCardClick(card: CollectionCard) {
+        try {
+            // Fetch full card details from Scryfall
+            const scryfallCard = await invoke<ScryfallCard>('get_card', { scryfallId: card.scryfall_id });
+            setSelectedCard(scryfallCard);
+            setSelectedCollectionCard(card);
+            setIsDetailsOpen(true);
+        } catch (error) {
+            console.error("Failed to fetch card details:", error);
+            alert("Failed to load card details. Please check your internet connection.");
+        }
     }
 
     if (loading) {
@@ -171,6 +190,7 @@ export default function Collection() {
                         <CardItem
                             key={card.id}
                             {...card}
+                            onClick={() => handleCardClick(card)}
                             onEdit={() => handleEditCard(card)}
                             onDelete={() => handleDeleteCard(card.id)}
                         />
@@ -190,6 +210,19 @@ export default function Collection() {
                 onCardUpdated={loadCollection}
                 card={cardToEdit}
             />
+
+            {selectedCard && isDetailsOpen && (
+                <CardDetailsModal
+                    card={selectedCard}
+                    collectionCard={selectedCollectionCard || undefined}
+                    mode="view"
+                    onClose={() => {
+                        setIsDetailsOpen(false);
+                        setSelectedCard(null);
+                        setSelectedCollectionCard(null);
+                    }}
+                />
+            )}
 
             <ConfirmDialog
                 isOpen={isDeleteDialogOpen}

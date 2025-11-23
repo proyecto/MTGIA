@@ -24,7 +24,7 @@ export default function CardItem({
     return (
         <div
             className="group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-100 overflow-hidden"
-            onClick={(!onEdit && !onDelete) ? onClick : undefined}
+            onClick={onClick}
         >
             <div className="aspect-[2.5/3.5] bg-gray-100 relative overflow-hidden">
                 {image_uri ? (

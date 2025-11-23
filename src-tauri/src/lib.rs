@@ -59,6 +59,7 @@ pub fn run() {
             commands::wishlist::remove_from_wishlist,
             commands::wishlist::update_wishlist_card,
             commands::collection::add_card,
+            commands::collection::get_card,
             commands::collection::search_scryfall,
             commands::collection::get_collection,
             commands::collection::remove_card,

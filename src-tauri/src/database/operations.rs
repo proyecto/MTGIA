@@ -437,4 +437,27 @@ mod tests {
         let cards = get_all_cards(&conn).unwrap();
         assert_eq!(cards.len(), 0);
     }
+
+    #[test]
+    fn test_update_card_details() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        let result = update_card_details(&conn, "test-uuid-1", "LP", 15.0);
+        assert!(result.is_ok());
+
+        let cards = get_all_cards(&conn).unwrap();
+        assert_eq!(cards[0].condition, "LP");
+        assert_eq!(cards[0].purchase_price, 15.0);
+    }
 }

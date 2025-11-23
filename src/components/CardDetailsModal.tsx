@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { ScryfallCard, AddCardArgs } from '../types';
+import { ScryfallCard, AddCardArgs, CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
 interface CardDetailsModalProps {
     card: ScryfallCard;
     onClose: () => void;
     onCardAdded?: () => void;
+    mode?: 'add' | 'view';
+    collectionCard?: CollectionCard;
 }
 
-export default function CardDetailsModal({ card, onClose, onCardAdded }: CardDetailsModalProps) {
-    const { currency } = useSettings();
+export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'add', collectionCard }: CardDetailsModalProps) {
+    const { currency, formatPrice } = useSettings();
     const [activeTab, setActiveTab] = useState<'collection' | 'wishlist'>('collection');
     const [loading, setLoading] = useState(false);
 
@@ -128,26 +130,30 @@ export default function CardDetailsModal({ card, onClose, onCardAdded }: CardDet
                 {/* Right: Actions */}
                 <div className="w-2/3 flex flex-col">
                     <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                        <div className="flex space-x-4">
-                            <button
-                                onClick={() => setActiveTab('collection')}
-                                className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'collection'
-                                    ? 'border-accent-blue text-accent-blue'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                                    }`}
-                            >
-                                Add to Collection
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('wishlist')}
-                                className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'wishlist'
-                                    ? 'border-accent-blue text-accent-blue'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                                    }`}
-                            >
-                                Add to Wishlist
-                            </button>
-                        </div>
+                        {mode === 'add' ? (
+                            <div className="flex space-x-4">
+                                <button
+                                    onClick={() => setActiveTab('collection')}
+                                    className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'collection'
+                                        ? 'border-accent-blue text-accent-blue'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        }`}
+                                >
+                                    Add to Collection
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('wishlist')}
+                                    className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'wishlist'
+                                        ? 'border-accent-blue text-accent-blue'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        }`}
+                                >
+                                    Add to Wishlist
+                                </button>
+                            </div>
+                        ) : (
+                            <h3 className="text-lg font-medium text-gray-900">Card Details</h3>
+                        )}
                         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -156,7 +162,50 @@ export default function CardDetailsModal({ card, onClose, onCardAdded }: CardDet
                     </div>
 
                     <div className="p-6 flex-1 overflow-y-auto">
-                        {activeTab === 'collection' ? (
+                        {mode === 'view' && collectionCard ? (
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <span className="block text-xs text-gray-500 uppercase mb-1">Quantity</span>
+                                        <span className="text-2xl font-bold text-gray-900">{collectionCard.quantity}</span>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <span className="block text-xs text-gray-500 uppercase mb-1">Condition</span>
+                                        <span className="text-2xl font-bold text-gray-900">{collectionCard.condition}</span>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <span className="block text-xs text-gray-500 uppercase mb-1">Purchase Price</span>
+                                        <span className="text-2xl font-bold text-gray-900">{formatPrice(collectionCard.purchase_price)}</span>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <span className="block text-xs text-gray-500 uppercase mb-1">Current Value</span>
+                                        <span className="text-2xl font-bold text-accent-blue">{formatPrice(collectionCard.current_price)}</span>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-6">
+                                    <h4 className="text-sm font-medium text-gray-900 mb-4">Market Prices</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg">
+                                            <span className="text-sm text-gray-600">USD</span>
+                                            <span className="font-medium">{card.prices.usd ? `$${card.prices.usd}` : 'N/A'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg">
+                                            <span className="text-sm text-gray-600">USD Foil</span>
+                                            <span className="font-medium">{card.prices.usd_foil ? `$${card.prices.usd_foil}` : 'N/A'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg">
+                                            <span className="text-sm text-gray-600">EUR</span>
+                                            <span className="font-medium">{card.prices.eur ? `€${card.prices.eur}` : 'N/A'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg">
+                                            <span className="text-sm text-gray-600">EUR Foil</span>
+                                            <span className="font-medium">{card.prices.eur_foil ? `€${card.prices.eur_foil}` : 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : activeTab === 'collection' ? (
                             <div className="space-y-6 max-w-md">
                                 <div>
                                     <label htmlFor="condition" className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
