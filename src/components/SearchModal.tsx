@@ -10,7 +10,7 @@ interface SearchModalProps {
 }
 
 export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModalProps) {
-    const { currency, formatPrice } = useSettings();
+    const { currency } = useSettings();
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<ScryfallCard[]>([]);
     const [loading, setLoading] = useState(false);
