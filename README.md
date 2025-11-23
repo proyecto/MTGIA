@@ -13,7 +13,7 @@ A powerful, modern desktop application for managing your Magic: The Gathering ca
 
 ## 📥 Download
 
-**macOS (Apple Silicon)**: [Download Installer]([release/dmg/MTG%20Collection%20Manager_0.1.0_aarch64.dmg](https://github.com/proyecto/MTGIA/raw/refs/heads/main/release/latest/MTG%20Collection%20Manager_0.1.0_aarch64.dmg))
+**macOS (Apple Silicon)**: [Download Installer]([release/dmg/MTG%20Collection%20Manager_0.1.0_aarch64.dmg](https://github.com/proyecto/MTGIA/raw/refs/heads/main/release/latest/MTG%20Collection%20Manager_0.1.0_aarch64.dmg)
 
 > Note: The DMG file is located in the `release/dmg` directory of this repository.
 
