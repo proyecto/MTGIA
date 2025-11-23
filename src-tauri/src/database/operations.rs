@@ -119,47 +119,12 @@ pub fn update_card_quantity(conn: &Connection, id: &str, quantity: i32) -> Resul
     Ok(())
 }
 
-pub fn update_prices(conn: &Connection, id: &str, current_price: f64) -> Result<()> {
-    conn.execute(
-        "UPDATE cards SET current_price = ?1 WHERE id = ?2",
-        params![current_price, id],
-    )?;
-    Ok(())
-}
-
 pub fn update_card_price(conn: &Connection, id: &str, price: f64) -> Result<()> {
     conn.execute(
         "UPDATE cards SET current_price = ?1 WHERE id = ?2",
         params![price, id],
     )?;
     Ok(())
-}
-
-pub fn get_portfolio_history(
-    conn: &Connection,
-) -> Result<Vec<crate::models::collection::PortfolioHistory>> {
-    let mut stmt = conn.prepare(
-        "SELECT ph.id, ph.card_id, ph.date, ph.price, ph.currency
-         FROM price_history ph
-         ORDER BY ph.date DESC",
-    )?;
-
-    let history_iter = stmt.query_map([], |row| {
-        Ok(crate::models::collection::PortfolioHistory {
-            id: row.get(0)?,
-            card_id: row.get(1)?,
-            date: row.get(2)?,
-            price: row.get(3)?,
-            currency: row.get(4)?,
-        })
-    })?;
-
-    let mut history = Vec::new();
-    for item in history_iter {
-        history.push(item?);
-    }
-
-    Ok(history)
 }
 
 pub fn insert_price_history(

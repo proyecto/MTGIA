@@ -14,12 +14,3 @@ pub struct CollectionCard {
     pub is_foil: bool,
     pub image_uri: Option<String>,
 }
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PortfolioHistory {
-    pub id: i32,
-    pub card_id: String,
-    pub date: String,
-    pub price: f64,
-    pub currency: String,
-}
