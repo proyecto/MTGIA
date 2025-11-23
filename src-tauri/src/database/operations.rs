@@ -1,35 +1,88 @@
-use rusqlite::{Connection, Result, params};
-use crate::models::scryfall::{ScryfallSet, ScryfallCard};
 use crate::commands::collection::AddCardArgs;
+use crate::models::scryfall::{ScryfallCard, ScryfallSet};
+use rusqlite::{params, Connection, Result};
 
 pub fn insert_set(conn: &Connection, set: &ScryfallSet) -> Result<()> {
     conn.execute(
         "INSERT OR REPLACE INTO sets (code, name, release_date, icon_uri)
          VALUES (?1, ?2, ?3, ?4)",
         params![
-            set.code, 
-            set.name, 
-            set.released_at, 
+            set.code,
+            set.name,
+            set.released_at,
             set.icon_svg_uri.clone().unwrap_or_default()
         ],
     )?;
     Ok(())
 }
 
-pub fn insert_card(conn: &Connection, id: &str, card: &ScryfallCard, args: &AddCardArgs, currency: &str) -> Result<()> {
-    let image_uri = card.image_uris.as_ref().map(|u| u.normal.clone()).unwrap_or_default();
-    
+pub fn get_all_sets(conn: &Connection) -> Result<Vec<ScryfallSet>> {
+    let mut stmt = conn.prepare(
+        "SELECT code, name, release_date, icon_uri
+         FROM sets
+         ORDER BY release_date DESC",
+    )?;
+
+    let set_iter = stmt.query_map([], |row| {
+        Ok(ScryfallSet {
+            id: String::new(), // Not stored in DB, will be empty
+            code: row.get(0)?,
+            name: row.get(1)?,
+            released_at: row.get(2)?,
+            icon_svg_uri: row.get(3)?,
+            set_type: None,
+            card_count: None,
+        })
+    })?;
+
+    let mut sets = Vec::new();
+    for set in set_iter {
+        sets.push(set?);
+    }
+
+    Ok(sets)
+}
+
+pub fn insert_card(
+    conn: &Connection,
+    id: &str,
+    card: &ScryfallCard,
+    args: &AddCardArgs,
+    currency: &str,
+) -> Result<()> {
+    let image_uri = card
+        .image_uris
+        .as_ref()
+        .map(|u| u.normal.clone())
+        .unwrap_or_default();
+
     let current_price = if currency == "EUR" {
         // Try EUR price, fallback to USD if missing
-        let price_str = if args.is_foil { &card.prices.eur_foil } else { &card.prices.eur };
-        price_str.as_ref()
-            .or(if args.is_foil { card.prices.usd_foil.as_ref() } else { card.prices.usd.as_ref() })
+        let price_str = if args.is_foil {
+            &card.prices.eur_foil
+        } else {
+            &card.prices.eur
+        };
+        price_str
+            .as_ref()
+            .or(if args.is_foil {
+                card.prices.usd_foil.as_ref()
+            } else {
+                card.prices.usd.as_ref()
+            })
             .and_then(|p| p.parse::<f64>().ok())
             .unwrap_or(0.0)
     } else {
         // Default to USD
-        let price_str = if args.is_foil { &card.prices.usd_foil } else { &card.prices.usd };
-        price_str.as_ref().and_then(|p| p.parse::<f64>().ok()).unwrap_or(0.0)
+        let price_str = if args.is_foil {
+            &card.prices.usd_foil
+        } else {
+            &card.prices.usd
+        };
+        price_str
+            .as_ref()
+            .and_then(|p| p.parse::<f64>().ok())
+            .unwrap_or(0.0)
     };
 
     conn.execute(
@@ -58,9 +111,9 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
     let mut stmt = conn.prepare(
         "SELECT id, scryfall_id, name, set_code, collector_number, 
                 condition, purchase_price, current_price, quantity, is_foil, image_uri
-         FROM cards"
+         FROM cards",
     )?;
-    
+
     let card_iter = stmt.query_map([], |row| {
         Ok(crate::models::collection::CollectionCard {
             id: row.get(0)?,
@@ -81,7 +134,7 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
     for card in card_iter {
         cards.push(card?);
     }
-    
+
     Ok(cards)
 }
 
@@ -106,7 +159,12 @@ pub fn update_card_price(conn: &Connection, id: &str, current_price: f64) -> Res
     Ok(())
 }
 
-pub fn insert_price_history(conn: &Connection, card_id: &str, price: f64, currency: &str) -> Result<()> {
+pub fn insert_price_history(
+    conn: &Connection,
+    card_id: &str,
+    price: f64,
+    currency: &str,
+) -> Result<()> {
     let date = chrono::Local::now().format("%Y-%m-%d").to_string();
     conn.execute(
         "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
@@ -115,7 +173,12 @@ pub fn insert_price_history(conn: &Connection, card_id: &str, price: f64, curren
     Ok(())
 }
 
-pub fn update_card_details(conn: &Connection, id: &str, condition: &str, purchase_price: f64) -> Result<()> {
+pub fn update_card_details(
+    conn: &Connection,
+    id: &str,
+    condition: &str,
+    purchase_price: f64,
+) -> Result<()> {
     conn.execute(
         "UPDATE cards SET condition = ?1, purchase_price = ?2 WHERE id = ?3",
         params![condition, purchase_price, id],

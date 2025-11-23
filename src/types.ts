@@ -44,3 +44,13 @@ export interface AddCardArgs {
     quantity: number;
     is_foil: boolean;
 }
+
+export interface ScryfallSet {
+    id: string;
+    code: string;
+    name: string;
+    released_at?: string;
+    icon_svg_uri?: string;
+    set_type?: string;
+    card_count?: number;
+}

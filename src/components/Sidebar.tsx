@@ -39,7 +39,10 @@ export default function Sidebar({ activeTab = 'collection', onTabChange }: Sideb
                         Sets
                     </h3>
                     <div className="space-y-1">
-                        <div className="sidebar-item">
+                        <div
+                            className="sidebar-item"
+                            onClick={() => onTabChange?.('allsets')}
+                        >
                             <span className="mr-3">📦</span>
                             <span>All Sets</span>
                         </div>
