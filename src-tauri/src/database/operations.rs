@@ -48,7 +48,7 @@ pub fn insert_card(
     id: &str,
     card: &ScryfallCard,
     args: &AddCardArgs,
-    currency: &str,
+    _currency: &str,
 ) -> Result<()> {
     let image_uri = card
         .image_uris
@@ -56,49 +56,18 @@ pub fn insert_card(
         .map(|u| u.normal.clone())
         .unwrap_or_default();
 
-    let current_price = if currency == "EUR" {
-        // Try EUR price, fallback to USD if missing
-        let price_str = if args.is_foil {
-            &card.prices.eur_foil
-        } else {
-            &card.prices.eur
-        };
-        price_str
-            .as_ref()
-            .or(if args.is_foil {
-                card.prices.usd_foil.as_ref()
-            } else {
-                card.prices.usd.as_ref()
-            })
-            .and_then(|p| p.parse::<f64>().ok())
-            .unwrap_or(0.0)
-    } else {
-        // Default to USD
-        let price_str = if args.is_foil {
-            &card.prices.usd_foil
-        } else {
-            &card.prices.usd
-        };
-        price_str
-            .as_ref()
-            .and_then(|p| p.parse::<f64>().ok())
-            .unwrap_or(0.0)
-    };
-
     conn.execute(
-        "INSERT INTO cards (
-            id, scryfall_id, name, set_code, collector_number, 
-            condition, purchase_price, current_price, quantity, is_foil, image_uri
-        ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
         params![
             id,
-            card.id,
+            args.scryfall_id,
             card.name,
             card.set,
             card.collector_number,
             args.condition,
             args.purchase_price,
-            current_price,
+            args.purchase_price, // Initially same as purchase price
             args.quantity,
             args.is_foil,
             image_uri
@@ -109,8 +78,7 @@ pub fn insert_card(
 
 pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection::CollectionCard>> {
     let mut stmt = conn.prepare(
-        "SELECT id, scryfall_id, name, set_code, collector_number, 
-                condition, purchase_price, current_price, quantity, is_foil, image_uri
+        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri
          FROM cards",
     )?;
 
@@ -151,12 +119,47 @@ pub fn update_card_quantity(conn: &Connection, id: &str, quantity: i32) -> Resul
     Ok(())
 }
 
-pub fn update_card_price(conn: &Connection, id: &str, current_price: f64) -> Result<()> {
+pub fn update_prices(conn: &Connection, id: &str, current_price: f64) -> Result<()> {
     conn.execute(
         "UPDATE cards SET current_price = ?1 WHERE id = ?2",
         params![current_price, id],
     )?;
     Ok(())
+}
+
+pub fn update_card_price(conn: &Connection, id: &str, price: f64) -> Result<()> {
+    conn.execute(
+        "UPDATE cards SET current_price = ?1 WHERE id = ?2",
+        params![price, id],
+    )?;
+    Ok(())
+}
+
+pub fn get_portfolio_history(
+    conn: &Connection,
+) -> Result<Vec<crate::models::collection::PortfolioHistory>> {
+    let mut stmt = conn.prepare(
+        "SELECT ph.id, ph.card_id, ph.date, ph.price, ph.currency
+         FROM price_history ph
+         ORDER BY ph.date DESC",
+    )?;
+
+    let history_iter = stmt.query_map([], |row| {
+        Ok(crate::models::collection::PortfolioHistory {
+            id: row.get(0)?,
+            card_id: row.get(1)?,
+            date: row.get(2)?,
+            price: row.get(3)?,
+            currency: row.get(4)?,
+        })
+    })?;
+
+    let mut history = Vec::new();
+    for item in history_iter {
+        history.push(item?);
+    }
+
+    Ok(history)
 }
 
 pub fn insert_price_history(
@@ -166,8 +169,10 @@ pub fn insert_price_history(
     currency: &str,
 ) -> Result<()> {
     let date = chrono::Local::now().format("%Y-%m-%d").to_string();
+
     conn.execute(
-        "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
+        "INSERT INTO price_history (card_id, date, price, currency)
+         VALUES (?1, ?2, ?3, ?4)",
         params![card_id, date, price, currency],
     )?;
     Ok(())
@@ -269,4 +274,123 @@ pub fn update_wishlist_card(
         params![target_price, notes, priority, id],
     )?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::database::schema::create_tables;
+    use crate::models::scryfall::{ImageUris, Prices};
+
+    fn setup_test_db() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        create_tables(&conn).unwrap();
+        conn
+    }
+
+    fn create_test_card() -> ScryfallCard {
+        ScryfallCard {
+            id: "test-id-123".to_string(),
+            name: "Test Card".to_string(),
+            set: "tst".to_string(),
+            set_name: "Test Set".to_string(),
+            collector_number: "1".to_string(),
+            rarity: "rare".to_string(),
+            artist: Some("Test Artist".to_string()),
+            released_at: "2024-01-01".to_string(),
+            image_uris: Some(ImageUris {
+                small: "https://example.com/small.jpg".to_string(),
+                normal: "https://example.com/normal.jpg".to_string(),
+                large: "https://example.com/large.jpg".to_string(),
+                png: "https://example.com/png.png".to_string(),
+                art_crop: "https://example.com/art_crop.jpg".to_string(),
+                border_crop: "https://example.com/border_crop.jpg".to_string(),
+            }),
+            prices: Prices {
+                usd: Some("10.00".to_string()),
+                usd_foil: Some("20.00".to_string()),
+                eur: Some("9.00".to_string()),
+                eur_foil: Some("18.00".to_string()),
+            },
+        }
+    }
+
+    #[test]
+    fn test_add_to_wishlist() {
+        let conn = setup_test_db();
+        let card = create_test_card();
+
+        let result = add_to_wishlist(&conn, &card, Some(15.0), Some("Test note".to_string()), 2);
+
+        assert!(result.is_ok());
+        let id = result.unwrap();
+        assert!(!id.is_empty());
+    }
+
+    #[test]
+    fn test_get_wishlist() {
+        let conn = setup_test_db();
+        let card = create_test_card();
+
+        add_to_wishlist(&conn, &card, Some(10.0), None, 1).unwrap();
+
+        let wishlist = get_wishlist(&conn).unwrap();
+
+        assert_eq!(wishlist.len(), 1);
+        assert_eq!(wishlist[0].name, "Test Card");
+        assert_eq!(wishlist[0].priority, 1);
+    }
+
+    #[test]
+    fn test_remove_from_wishlist() {
+        let conn = setup_test_db();
+        let card = create_test_card();
+
+        let id = add_to_wishlist(&conn, &card, None, None, 1).unwrap();
+        let result = remove_from_wishlist(&conn, &id);
+
+        assert!(result.is_ok());
+
+        let wishlist = get_wishlist(&conn).unwrap();
+        assert_eq!(wishlist.len(), 0);
+    }
+
+    #[test]
+    fn test_update_wishlist_card() {
+        let conn = setup_test_db();
+        let card = create_test_card();
+
+        let id =
+            add_to_wishlist(&conn, &card, Some(10.0), Some("Old note".to_string()), 1).unwrap();
+
+        let result = update_wishlist_card(&conn, &id, Some(20.0), Some("New note".to_string()), 3);
+        assert!(result.is_ok());
+
+        let wishlist = get_wishlist(&conn).unwrap();
+        assert_eq!(wishlist[0].target_price, Some(20.0));
+        assert_eq!(wishlist[0].notes, Some("New note".to_string()));
+        assert_eq!(wishlist[0].priority, 3);
+    }
+
+    #[test]
+    fn test_wishlist_ordering() {
+        let conn = setup_test_db();
+        let card1 = create_test_card();
+        let mut card2 = create_test_card();
+        card2.id = "test-id-456".to_string();
+        card2.name = "Another Card".to_string();
+
+        // Add cards with different priorities
+        add_to_wishlist(&conn, &card1, None, None, 1).unwrap(); // Low priority
+        add_to_wishlist(&conn, &card2, None, None, 3).unwrap(); // High priority
+
+        let wishlist = get_wishlist(&conn).unwrap();
+
+        // High priority should come first
+        assert_eq!(wishlist.len(), 2);
+        assert_eq!(wishlist[0].name, "Another Card");
+        assert_eq!(wishlist[0].priority, 3);
+        assert_eq!(wishlist[1].name, "Test Card");
+        assert_eq!(wishlist[1].priority, 1);
+    }
 }
