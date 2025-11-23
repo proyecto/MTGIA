@@ -53,6 +53,7 @@ pub fn run() {
             init_db_command,
             commands::scryfall::import_sets,
             commands::scryfall::get_sets,
+            commands::sets::get_set_cards,
             commands::collection::add_card,
             commands::collection::search_scryfall,
             commands::collection::get_collection,

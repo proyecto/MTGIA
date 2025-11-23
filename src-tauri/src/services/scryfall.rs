@@ -24,7 +24,7 @@ impl ScryfallService {
         let url = format!("{}/sets", self.base_url);
         let resp = self.client.get(&url).send().await?;
         let text = resp.text().await?;
-        
+
         // Try to parse as success
         match serde_json::from_str::<ScryfallSetList>(&text) {
             Ok(list) => Ok(list.data),
@@ -36,16 +36,47 @@ impl ScryfallService {
         }
     }
 
-    pub async fn fetch_card(&self, id: &str) -> Result<crate::models::scryfall::ScryfallCard, Box<dyn Error>> {
+    pub async fn fetch_card(
+        &self,
+        id: &str,
+    ) -> Result<crate::models::scryfall::ScryfallCard, Box<dyn Error>> {
         let url = format!("{}/cards/{}", self.base_url, id);
         let resp = self.client.get(&url).send().await?;
         let card: crate::models::scryfall::ScryfallCard = resp.json().await?;
         Ok(card)
     }
 
-    pub async fn search_cards(&self, query: &str) -> Result<Vec<crate::models::scryfall::ScryfallCard>, Box<dyn Error>> {
+    pub async fn search_cards(
+        &self,
+        query: &str,
+    ) -> Result<Vec<crate::models::scryfall::ScryfallCard>, Box<dyn Error>> {
         let url = format!("{}/cards/search", self.base_url);
-        let resp = self.client.get(&url).query(&[("q", query), ("unique", "prints")]).send().await?;
+        let resp = self
+            .client
+            .get(&url)
+            .query(&[("q", query), ("unique", "prints")])
+            .send()
+            .await?;
+        let list: crate::models::scryfall::ScryfallCardList = resp.json().await?;
+        Ok(list.data)
+    }
+
+    pub async fn fetch_cards_by_set(
+        &self,
+        set_code: &str,
+    ) -> Result<Vec<crate::models::scryfall::ScryfallCard>, Box<dyn Error>> {
+        let url = format!("{}/cards/search", self.base_url);
+        let query = format!("e:{}", set_code);
+        let resp = self
+            .client
+            .get(&url)
+            .query(&[
+                ("q", query.as_str()),
+                ("unique", "prints"),
+                ("order", "set"),
+            ])
+            .send()
+            .await?;
         let list: crate::models::scryfall::ScryfallCardList = resp.json().await?;
         Ok(list.data)
     }

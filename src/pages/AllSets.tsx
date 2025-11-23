@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ScryfallSet } from '../types';
+import SetCards from './SetCards';
 
 export default function AllSets() {
     const [sets, setSets] = useState<ScryfallSet[]>([]);
@@ -8,6 +9,7 @@ export default function AllSets() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [selectedSet, setSelectedSet] = useState<ScryfallSet | null>(null);
 
     useEffect(() => {
         loadSets();
@@ -53,6 +55,17 @@ export default function AllSets() {
         } finally {
             setLoading(false);
         }
+    }
+
+    // If a set is selected, show the SetCards view
+    if (selectedSet) {
+        return (
+            <SetCards
+                setCode={selectedSet.code}
+                setName={selectedSet.name}
+                onBack={() => setSelectedSet(null)}
+            />
+        );
     }
 
     if (loading) {
@@ -148,6 +161,7 @@ export default function AllSets() {
                             <div
                                 key={set.code}
                                 className="bg-white border border-border-color rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer group"
+                                onClick={() => setSelectedSet(set)}
                             >
                                 <div className="flex items-start gap-3">
                                     {/* Set Icon */}
