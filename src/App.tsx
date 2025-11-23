@@ -4,6 +4,7 @@ import Collection from "./pages/Collection";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import AllSets from "./pages/AllSets";
+import Wishlist from "./pages/Wishlist";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./App.css";
@@ -19,8 +20,7 @@ function App() {
           {activeTab === "settings" && <Settings />}
           {activeTab === "decks" && <Dashboard />}
           {activeTab === "allsets" && <AllSets />}
-          {/* Placeholders for other tabs */}
-          {activeTab === "wishlist" && <div className="text-center text-gray-500 mt-20">Wishlist Feature Coming Soon</div>}
+          {activeTab === "wishlist" && <Wishlist />}
         </MainLayout>
       </SettingsProvider>
     </ErrorBoundary>

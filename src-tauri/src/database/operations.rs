@@ -185,3 +185,88 @@ pub fn update_card_details(
     )?;
     Ok(())
 }
+
+// ============ Wishlist Operations ============
+
+pub fn add_to_wishlist(
+    conn: &Connection,
+    card: &ScryfallCard,
+    target_price: Option<f64>,
+    notes: Option<String>,
+    priority: i32,
+) -> Result<String> {
+    let id = uuid::Uuid::new_v4().to_string();
+    let added_date = chrono::Local::now().format("%Y-%m-%d").to_string();
+    let image_uri = card
+        .image_uris
+        .as_ref()
+        .map(|u| u.normal.clone())
+        .unwrap_or_default();
+
+    conn.execute(
+        "INSERT INTO wishlist (id, scryfall_id, name, set_code, collector_number, image_uri, target_price, notes, added_date, priority)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+        params![
+            id,
+            card.id,
+            card.name,
+            card.set,
+            card.collector_number,
+            image_uri,
+            target_price,
+            notes,
+            added_date,
+            priority
+        ],
+    )?;
+    Ok(id)
+}
+
+pub fn get_wishlist(conn: &Connection) -> Result<Vec<crate::models::wishlist::WishlistCard>> {
+    let mut stmt = conn.prepare(
+        "SELECT id, scryfall_id, name, set_code, collector_number, image_uri, target_price, notes, added_date, priority
+         FROM wishlist
+         ORDER BY priority DESC, added_date DESC",
+    )?;
+
+    let wishlist_iter = stmt.query_map([], |row| {
+        Ok(crate::models::wishlist::WishlistCard {
+            id: row.get(0)?,
+            scryfall_id: row.get(1)?,
+            name: row.get(2)?,
+            set_code: row.get(3)?,
+            collector_number: row.get(4)?,
+            image_uri: row.get(5)?,
+            target_price: row.get(6)?,
+            notes: row.get(7)?,
+            added_date: row.get(8)?,
+            priority: row.get(9)?,
+        })
+    })?;
+
+    let mut wishlist = Vec::new();
+    for card in wishlist_iter {
+        wishlist.push(card?);
+    }
+
+    Ok(wishlist)
+}
+
+pub fn remove_from_wishlist(conn: &Connection, id: &str) -> Result<()> {
+    conn.execute("DELETE FROM wishlist WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
+pub fn update_wishlist_card(
+    conn: &Connection,
+    id: &str,
+    target_price: Option<f64>,
+    notes: Option<String>,
+    priority: i32,
+) -> Result<()> {
+    conn.execute(
+        "UPDATE wishlist SET target_price = ?1, notes = ?2, priority = ?3 WHERE id = ?4",
+        params![target_price, notes, priority, id],
+    )?;
+    Ok(())
+}

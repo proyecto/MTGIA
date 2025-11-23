@@ -44,5 +44,22 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
         [],
     )?;
 
+    // Wishlist table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS wishlist (
+            id TEXT PRIMARY KEY,
+            scryfall_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            set_code TEXT NOT NULL,
+            collector_number TEXT NOT NULL,
+            image_uri TEXT,
+            target_price REAL,
+            notes TEXT,
+            added_date TEXT NOT NULL,
+            priority INTEGER DEFAULT 1
+        )",
+        [],
+    )?;
+
     Ok(())
 }

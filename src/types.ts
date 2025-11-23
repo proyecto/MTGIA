@@ -54,3 +54,16 @@ export interface ScryfallSet {
     set_type?: string;
     card_count?: number;
 }
+
+export interface WishlistCard {
+    id: string;
+    scryfall_id: string;
+    name: string;
+    set_code: string;
+    collector_number: string;
+    image_uri?: string;
+    target_price?: number;
+    notes?: string;
+    added_date: string;
+    priority: number;
+}
