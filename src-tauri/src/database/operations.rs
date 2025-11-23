@@ -358,4 +358,83 @@ mod tests {
         assert_eq!(wishlist[1].name, "Test Card");
         assert_eq!(wishlist[1].priority, 1);
     }
+
+    fn insert_test_set(conn: &Connection) {
+        let set = ScryfallSet {
+            id: "test-set-id".to_string(),
+            code: "tst".to_string(),
+            name: "Test Set".to_string(),
+            released_at: Some("2024-01-01".to_string()),
+            icon_svg_uri: None,
+            set_type: None,
+            card_count: None,
+        };
+        insert_set(conn, &set).unwrap();
+    }
+
+    #[test]
+    fn test_insert_card() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        let result = insert_card(&conn, "test-uuid-1", &card, &args, "USD");
+        assert!(result.is_ok());
+
+        let cards = get_all_cards(&conn).unwrap();
+        assert_eq!(cards.len(), 1);
+        assert_eq!(cards[0].name, "Test Card");
+        assert_eq!(cards[0].quantity, 1);
+    }
+
+    #[test]
+    fn test_update_card_quantity() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        let result = update_card_quantity(&conn, "test-uuid-1", 4);
+        assert!(result.is_ok());
+
+        let cards = get_all_cards(&conn).unwrap();
+        assert_eq!(cards[0].quantity, 4);
+    }
+
+    #[test]
+    fn test_remove_card() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        let result = remove_card(&conn, "test-uuid-1");
+        assert!(result.is_ok());
+
+        let cards = get_all_cards(&conn).unwrap();
+        assert_eq!(cards.len(), 0);
+    }
 }

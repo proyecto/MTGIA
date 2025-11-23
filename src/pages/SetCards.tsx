@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ScryfallCard } from '../types';
+import CardDetailsModal from '../components/CardDetailsModal';
 
 interface SetCardsProps {
     setCode: string;
@@ -12,6 +13,7 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
     const [cards, setCards] = useState<ScryfallCard[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
 
     useEffect(() => {
         loadCards();
@@ -117,6 +119,7 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
                                 key={card.id}
                                 className="group cursor-pointer"
                                 title={card.name}
+                                onClick={() => setSelectedCard(card)}
                             >
                                 <div className="relative aspect-[5/7] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all transform hover:scale-105">
                                     {card.image_uris?.normal ? (
@@ -138,9 +141,9 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
                                     {/* Rarity indicator */}
                                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <div className={`w-3 h-3 rounded-full ${card.rarity === 'mythic' ? 'bg-orange-500' :
-                                                card.rarity === 'rare' ? 'bg-yellow-500' :
-                                                    card.rarity === 'uncommon' ? 'bg-gray-400' :
-                                                        'bg-gray-600'
+                                            card.rarity === 'rare' ? 'bg-yellow-500' :
+                                                card.rarity === 'uncommon' ? 'bg-gray-400' :
+                                                    'bg-gray-600'
                                             }`} title={card.rarity}></div>
                                     </div>
                                 </div>
@@ -154,6 +157,14 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
                     </div>
                 )}
             </div>
+
+            {/* Card Details Modal */}
+            {selectedCard && (
+                <CardDetailsModal
+                    card={selectedCard}
+                    onClose={() => setSelectedCard(null)}
+                />
+            )}
         </div>
     );
 }

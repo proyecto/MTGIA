@@ -21,6 +21,8 @@ export interface ScryfallCard {
         eur_foil?: string;
     };
     rarity: string;
+    type_line?: string;
+    oracle_text?: string;
 }
 
 export interface CollectionCard {
