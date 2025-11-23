@@ -2,8 +2,6 @@
 
 A powerful, modern desktop application for managing your Magic: The Gathering card collection. Built with Tauri, Rust, and React.
 
-![MTG Collection Manager](https://images.unsplash.com/photo-1593642632823-8f78536788c6?auto=format&fit=crop&w=1200&q=80)
-
 ## 🚀 Features
 
 - **Collection Management**: Easily add cards to your collection, track quantities, conditions (Mint, Near Mint, etc.), and foil status.
