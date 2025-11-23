@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import CardGrid from '../components/CardGrid';
 import CardItem from '../components/CardItem';
 import StatisticsModal from '../components/StatisticsModal';
+import EditCardModal from '../components/EditCardModal';
 import { CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
@@ -13,6 +14,8 @@ export default function Collection() {
     const [sortOption, setSortOption] = useState<'name' | 'price-desc' | 'price-asc' | 'quantity'>('name');
     const [selectedSet, setSelectedSet] = useState<string>('all');
     const [isStatsOpen, setIsStatsOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [cardToEdit, setCardToEdit] = useState<CollectionCard | null>(null);
 
     useEffect(() => {
         loadCollection();
@@ -27,6 +30,23 @@ export default function Collection() {
         } finally {
             setLoading(false);
         }
+    }
+
+    async function handleDeleteCard(id: string) {
+        if (!confirm('Are you sure you want to delete this card?')) return;
+
+        try {
+            await invoke('remove_card', { id });
+            loadCollection();
+        } catch (error) {
+            console.error("Failed to delete card:", error);
+            alert(`Failed to delete card: ${error} `);
+        }
+    }
+
+    function handleEditCard(card: CollectionCard) {
+        setCardToEdit(card);
+        setIsEditOpen(true);
     }
 
     if (loading) {
@@ -128,7 +148,12 @@ export default function Collection() {
             ) : (
                 <CardGrid>
                     {sortedCards.map((card) => (
-                        <CardItem key={card.id} {...card} />
+                        <CardItem
+                            key={card.id}
+                            {...card}
+                            onEdit={() => handleEditCard(card)}
+                            onDelete={() => handleDeleteCard(card.id)}
+                        />
                     ))}
                 </CardGrid>
             )}
@@ -137,6 +162,13 @@ export default function Collection() {
                 isOpen={isStatsOpen}
                 onClose={() => setIsStatsOpen(false)}
                 cards={cards}
+            />
+
+            <EditCardModal
+                isOpen={isEditOpen}
+                onClose={() => setIsEditOpen(false)}
+                onCardUpdated={loadCollection}
+                card={cardToEdit}
             />
         </div>
     );

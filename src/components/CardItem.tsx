@@ -3,6 +3,8 @@ import { useSettings } from '../contexts/SettingsContext';
 
 interface CardItemProps extends CollectionCard {
     onClick?: () => void;
+    onEdit?: () => void;
+    onDelete?: () => void;
 }
 
 export default function CardItem({
@@ -13,7 +15,9 @@ export default function CardItem({
     current_price,
     quantity,
     is_foil,
-    onClick
+    onClick,
+    onEdit,
+    onDelete
 }: CardItemProps) {
     const { formatPrice } = useSettings();
 
@@ -55,6 +59,34 @@ export default function CardItem({
                         x{quantity}
                     </div>
                 </div>
+
+                {/* Action buttons - shown on hover */}
+                {(onEdit || onDelete) && (
+                    <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {onEdit && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEdit();
+                                }}
+                                className="flex-1 text-xs px-2 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors font-medium"
+                            >
+                                ✏️ Edit
+                            </button>
+                        )}
+                        {onDelete && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete();
+                                }}
+                                className="flex-1 text-xs px-2 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors font-medium"
+                            >
+                                🗑️ Delete
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -86,3 +86,14 @@ pub async fn update_prices(state: State<'_, AppState>, currency_preference: Stri
     
     Ok(format!("Updated prices for {} cards", updated_count))
 }
+
+#[tauri::command]
+pub async fn update_card_details(
+    state: State<'_, AppState>, 
+    id: String, 
+    condition: String, 
+    purchase_price: f64
+) -> Result<(), String> {
+    let db = state.db.lock().map_err(|_| "Failed to lock db".to_string())?;
+    operations::update_card_details(&db, &id, &condition, purchase_price).map_err(|e| e.to_string())
+}

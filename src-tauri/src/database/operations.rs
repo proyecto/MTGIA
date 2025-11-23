@@ -114,3 +114,11 @@ pub fn insert_price_history(conn: &Connection, card_id: &str, price: f64, curren
     )?;
     Ok(())
 }
+
+pub fn update_card_details(conn: &Connection, id: &str, condition: &str, purchase_price: f64) -> Result<()> {
+    conn.execute(
+        "UPDATE cards SET condition = ?1, purchase_price = ?2 WHERE id = ?3",
+        params![condition, purchase_price, id],
+    )?;
+    Ok(())
+}
