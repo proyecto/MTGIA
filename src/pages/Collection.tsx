@@ -4,6 +4,7 @@ import CardGrid from '../components/CardGrid';
 import CardItem from '../components/CardItem';
 import StatisticsModal from '../components/StatisticsModal';
 import EditCardModal from '../components/EditCardModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
@@ -16,6 +17,8 @@ export default function Collection() {
     const [isStatsOpen, setIsStatsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [cardToEdit, setCardToEdit] = useState<CollectionCard | null>(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [cardToDelete, setCardToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         loadCollection();
@@ -32,16 +35,33 @@ export default function Collection() {
         }
     }
 
-    async function handleDeleteCard(id: string) {
-        if (!confirm('Are you sure you want to delete this card?')) return;
+    function handleDeleteCard(id: string) {
+        console.log('Delete button clicked for card:', id);
+        setCardToDelete(id);
+        setIsDeleteDialogOpen(true);
+    }
 
+    async function confirmDelete() {
+        if (!cardToDelete) return;
+
+        console.log('Attempting to delete card...');
         try {
-            await invoke('remove_card', { id });
+            await invoke('remove_card', { id: cardToDelete });
+            console.log('Card deleted successfully');
             loadCollection();
         } catch (error) {
             console.error("Failed to delete card:", error);
-            alert(`Failed to delete card: ${error} `);
+            alert(`Failed to delete card: ${error}`);
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setCardToDelete(null);
         }
+    }
+
+    function cancelDelete() {
+        console.log('Delete cancelled by user');
+        setIsDeleteDialogOpen(false);
+        setCardToDelete(null);
     }
 
     function handleEditCard(card: CollectionCard) {
@@ -169,6 +189,14 @@ export default function Collection() {
                 onClose={() => setIsEditOpen(false)}
                 onCardUpdated={loadCollection}
                 card={cardToEdit}
+            />
+
+            <ConfirmDialog
+                isOpen={isDeleteDialogOpen}
+                title="Delete Card"
+                message="Are you sure you want to delete this card from your collection? This action cannot be undone."
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
             />
         </div>
     );

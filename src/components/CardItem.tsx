@@ -24,7 +24,7 @@ export default function CardItem({
     return (
         <div
             className="group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-100 overflow-hidden"
-            onClick={onClick}
+            onClick={(!onEdit && !onDelete) ? onClick : undefined}
         >
             <div className="aspect-[2.5/3.5] bg-gray-100 relative overflow-hidden">
                 {image_uri ? (
@@ -66,9 +66,11 @@ export default function CardItem({
                         {onEdit && (
                             <button
                                 onClick={(e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
                                     onEdit();
                                 }}
+                                type="button"
                                 className="flex-1 text-xs px-2 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors font-medium"
                             >
                                 ✏️ Edit
@@ -77,9 +79,11 @@ export default function CardItem({
                         {onDelete && (
                             <button
                                 onClick={(e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
                                     onDelete();
                                 }}
+                                type="button"
                                 className="flex-1 text-xs px-2 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors font-medium"
                             >
                                 🗑️ Delete

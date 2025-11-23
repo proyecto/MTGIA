@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useSettings } from '../contexts/SettingsContext';
+import PortfolioChart from '../components/PortfolioChart';
 
 export default function Dashboard() {
     const { currency } = useSettings();
@@ -13,6 +14,8 @@ export default function Dashboard() {
         try {
             const result = await invoke<string>('update_prices', { currencyPreference: currency });
             setMessage(result);
+            // Reload the chart after updating prices
+            window.location.reload();
         } catch (error) {
             console.error('Failed to update prices:', error);
             setMessage(`Error: ${error}`);
@@ -46,8 +49,8 @@ export default function Dashboard() {
                         onClick={handleUpdatePrices}
                         disabled={updating}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${updating
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-accent-blue text-white hover:bg-blue-600'
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-accent-blue text-white hover:bg-blue-600'
                             }`}
                     >
                         {updating ? 'Updating...' : 'Update Prices'}
@@ -63,14 +66,10 @@ export default function Dashboard() {
                 )}
             </section>
 
-            {/* Placeholder for future charts */}
+            {/* Portfolio Value Chart */}
             <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Portfolio Value</h2>
-                <div className="text-center py-20 text-gray-400">
-                    <p className="mb-2">📈</p>
-                    <p>Portfolio value chart coming soon!</p>
-                    <p className="text-xs mt-2">Update prices regularly to track your collection's value over time.</p>
-                </div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Portfolio Value Over Time</h2>
+                <PortfolioChart />
             </section>
         </div>
     );
