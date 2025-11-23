@@ -51,3 +51,38 @@ pub async fn update_card_quantity(state: State<'_, AppState>, id: String, quanti
     let db = state.db.lock().map_err(|_| "Failed to lock db".to_string())?;
     operations::update_card_quantity(&db, &id, quantity).map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub async fn update_prices(state: State<'_, AppState>, currency_preference: String) -> Result<String, String> {
+    let service = crate::services::prices::PriceService::new();
+    
+    // Extract card data while holding the lock, then release it
+    let cards = {
+        let db = state.db.lock().map_err(|_| "Failed to lock db".to_string())?;
+        operations::get_all_cards(&db).map_err(|e| e.to_string())?
+    };
+    
+    // Now do async work without holding the lock
+    let mut updated_count = 0;
+    for card in cards {
+        std::thread::sleep(std::time::Duration::from_millis(100));
+        
+        match service.fetch_and_update_price(&card, &currency_preference).await {
+            Ok(Some(price)) => {
+                // Re-acquire lock for each update
+                let db = state.db.lock().map_err(|_| "Failed to lock db".to_string())?;
+                operations::update_card_price(&db, &card.id, price).map_err(|e| e.to_string())?;
+                operations::insert_price_history(&db, &card.id, price, &currency_preference).map_err(|e| e.to_string())?;
+                updated_count += 1;
+            },
+            Ok(None) => {
+                println!("No price available for {}", card.name);
+            },
+            Err(e) => {
+                println!("Failed to fetch price for {}: {}", card.name, e);
+            }
+        }
+    }
+    
+    Ok(format!("Updated prices for {} cards", updated_count))
+}

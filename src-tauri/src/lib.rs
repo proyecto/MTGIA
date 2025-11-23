@@ -50,7 +50,8 @@ pub fn run() {
             commands::collection::search_scryfall,
             commands::collection::get_collection,
             commands::collection::remove_card,
-            commands::collection::update_card_quantity
+            commands::collection::update_card_quantity,
+            commands::collection::update_prices,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

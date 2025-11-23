@@ -8,7 +8,7 @@ interface SidebarProps {
 export default function Sidebar({ activeTab = 'collection', onTabChange }: SidebarProps) {
     const menuItems = [
         { id: 'collection', label: 'My Collection', icon: '📚' },
-        { id: 'decks', label: 'Decks', icon: '🃏' },
+        { id: 'decks', label: 'Dashboard', icon: '📊' },
         { id: 'wishlist', label: 'Wishlist', icon: '⭐️' },
         { id: 'settings', label: 'Settings', icon: '⚙️' },
     ];

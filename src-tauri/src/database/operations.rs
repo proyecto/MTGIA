@@ -91,6 +91,26 @@ pub fn remove_card(conn: &Connection, id: &str) -> Result<()> {
 }
 
 pub fn update_card_quantity(conn: &Connection, id: &str, quantity: i32) -> Result<()> {
-    conn.execute("UPDATE cards SET quantity = ?1 WHERE id = ?2", params![quantity, id])?;
+    conn.execute(
+        "UPDATE cards SET quantity = ?1 WHERE id = ?2",
+        params![quantity, id],
+    )?;
+    Ok(())
+}
+
+pub fn update_card_price(conn: &Connection, id: &str, current_price: f64) -> Result<()> {
+    conn.execute(
+        "UPDATE cards SET current_price = ?1 WHERE id = ?2",
+        params![current_price, id],
+    )?;
+    Ok(())
+}
+
+pub fn insert_price_history(conn: &Connection, card_id: &str, price: f64, currency: &str) -> Result<()> {
+    let date = chrono::Local::now().format("%Y-%m-%d").to_string();
+    conn.execute(
+        "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
+        params![card_id, date, price, currency],
+    )?;
     Ok(())
 }
