@@ -14,7 +14,7 @@ export default function Sidebar({ activeTab = 'collection', onTabChange }: Sideb
     ];
 
     return (
-        <aside className="w-64 bg-sidebar-bg border-r border-border-color flex flex-col h-full">
+        <aside className="w-[236px] bg-sidebar-bg border-r border-border-color flex flex-col h-full">
             <div className="p-4 pt-8">
                 <h1 className="text-xl font-bold text-text-primary mb-1">MTG Manager</h1>
                 <p className="text-xs text-text-secondary">Collection Tracker</p>
