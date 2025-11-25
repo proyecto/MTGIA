@@ -14,8 +14,6 @@ export default function Dashboard() {
         try {
             const result = await invoke<string>('update_prices', { currencyPreference: currency });
             setMessage(result);
-            // Reload the chart after updating prices
-            window.location.reload();
         } catch (error) {
             console.error('Failed to update prices:', error);
             setMessage(`Error: ${error}`);

@@ -182,10 +182,13 @@ pub async fn get_portfolio_history(
     let mut history = Vec::new();
 
     for date in dates {
-        // Get total value for this date
+        // Get total value for this date by joining with cards table to get quantities
         let total_value: f64 = db
             .query_row(
-                "SELECT SUM(price) FROM price_history WHERE date = ?1",
+                "SELECT SUM(ph.price * c.quantity) 
+                 FROM price_history ph
+                 JOIN cards c ON ph.card_id = c.id
+                 WHERE ph.date = ?1",
                 [&date],
                 |row| row.get(0),
             )

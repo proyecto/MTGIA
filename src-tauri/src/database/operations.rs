@@ -107,6 +107,9 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
 }
 
 pub fn remove_card(conn: &Connection, id: &str) -> Result<()> {
+    // First, delete all price history entries for this card
+    conn.execute("DELETE FROM price_history WHERE card_id = ?1", params![id])?;
+    // Then delete the card itself
     conn.execute("DELETE FROM cards WHERE id = ?1", params![id])?;
     Ok(())
 }
@@ -135,6 +138,14 @@ pub fn insert_price_history(
 ) -> Result<()> {
     let date = chrono::Local::now().format("%Y-%m-%d").to_string();
 
+    // Use INSERT OR REPLACE to update if entry already exists for this card+date
+    // First, delete any existing entry for this card on this date
+    conn.execute(
+        "DELETE FROM price_history WHERE card_id = ?1 AND date = ?2",
+        params![card_id, date],
+    )?;
+
+    // Then insert the new price
     conn.execute(
         "INSERT INTO price_history (card_id, date, price, currency)
          VALUES (?1, ?2, ?3, ?4)",
@@ -436,6 +447,108 @@ mod tests {
 
         let cards = get_all_cards(&conn).unwrap();
         assert_eq!(cards.len(), 0);
+    }
+
+    #[test]
+    fn test_remove_card_with_price_history() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        // Insert card
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        // Add some price history
+        insert_price_history(&conn, "test-uuid-1", 15.0, "USD").unwrap();
+        insert_price_history(&conn, "test-uuid-1", 20.0, "USD").unwrap();
+
+        // Verify price history exists
+        let history_count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM price_history WHERE card_id = ?1",
+                ["test-uuid-1"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(history_count, 2);
+
+        // Remove card
+        let result = remove_card(&conn, "test-uuid-1");
+        assert!(result.is_ok());
+
+        // Verify card is deleted
+        let cards = get_all_cards(&conn).unwrap();
+        assert_eq!(cards.len(), 0);
+
+        // Verify price history is also deleted
+        let history_count_after: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM price_history WHERE card_id = ?1",
+                ["test-uuid-1"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(history_count_after, 0);
+    }
+
+    #[test]
+    fn test_insert_price_history_prevents_duplicates() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        // Insert card
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        // Insert price history for today
+        insert_price_history(&conn, "test-uuid-1", 15.0, "USD").unwrap();
+
+        // Verify one entry exists
+        let count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM price_history WHERE card_id = ?1",
+                ["test-uuid-1"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 1);
+
+        // Insert again for the same day (simulating clicking update prices twice)
+        insert_price_history(&conn, "test-uuid-1", 20.0, "USD").unwrap();
+
+        // Should still have only one entry (updated, not duplicated)
+        let count_after: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM price_history WHERE card_id = ?1",
+                ["test-uuid-1"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count_after, 1);
+
+        // Verify the price was updated to the latest value
+        let latest_price: f64 = conn
+            .query_row(
+                "SELECT price FROM price_history WHERE card_id = ?1",
+                ["test-uuid-1"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(latest_price, 20.0);
     }
 
     #[test]

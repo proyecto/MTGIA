@@ -27,6 +27,10 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
     const [priority, setPriority] = useState(1);
     const [notes, setNotes] = useState('');
 
+    // View mode editable state
+    const [editCondition, setEditCondition] = useState('NM');
+    const [editPurchasePrice, setEditPurchasePrice] = useState(0);
+
     useEffect(() => {
         // Auto-fill price based on selection and currency
         let priceStr;
@@ -37,6 +41,14 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
         }
         setPrice(priceStr ? parseFloat(priceStr) : 0);
     }, [card, isFoil, currency]);
+
+    useEffect(() => {
+        // Initialize editable fields from collectionCard
+        if (collectionCard) {
+            setEditCondition(collectionCard.condition);
+            setEditPurchasePrice(collectionCard.purchase_price);
+        }
+    }, [collectionCard]);
 
     async function handleAddToCollection() {
         setLoading(true);
@@ -76,6 +88,26 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
         } catch (error) {
             console.error("Failed to add to wishlist:", error);
             alert(`Failed to add card: ${error}`);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleSaveChanges() {
+        if (!collectionCard) return;
+
+        setLoading(true);
+        try {
+            await invoke('update_card_details', {
+                id: collectionCard.id,
+                condition: editCondition,
+                purchasePrice: editPurchasePrice,
+            });
+            if (onCardAdded) onCardAdded(); // Refresh collection
+            alert('Changes saved successfully!');
+        } catch (error) {
+            console.error("Failed to update card:", error);
+            alert(`Failed to save changes: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -170,18 +202,42 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         <span className="text-2xl font-bold text-gray-900">{collectionCard.quantity}</span>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-lg">
-                                        <span className="block text-xs text-gray-500 uppercase mb-1">Condition</span>
-                                        <span className="text-2xl font-bold text-gray-900">{collectionCard.condition}</span>
+                                        <span className="block text-xs text-gray-500 uppercase mb-2">Condition</span>
+                                        <select
+                                            value={editCondition}
+                                            onChange={(e) => setEditCondition(e.target.value)}
+                                            className="w-full text-lg font-bold text-gray-900 bg-white border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-accent-blue focus:border-transparent"
+                                        >
+                                            <option value="NM">NM</option>
+                                            <option value="LP">LP</option>
+                                            <option value="MP">MP</option>
+                                            <option value="HP">HP</option>
+                                            <option value="DMG">DMG</option>
+                                        </select>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-lg">
-                                        <span className="block text-xs text-gray-500 uppercase mb-1">Purchase Price</span>
-                                        <span className="text-2xl font-bold text-gray-900">{formatPrice(collectionCard.purchase_price)}</span>
+                                        <span className="block text-xs text-gray-500 uppercase mb-2">Purchase Price</span>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={editPurchasePrice}
+                                            onChange={(e) => setEditPurchasePrice(parseFloat(e.target.value))}
+                                            className="w-full text-lg font-bold text-gray-900 bg-white border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-accent-blue focus:border-transparent"
+                                        />
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-lg">
                                         <span className="block text-xs text-gray-500 uppercase mb-1">Current Value</span>
                                         <span className="text-2xl font-bold text-accent-blue">{formatPrice(collectionCard.current_price)}</span>
                                     </div>
                                 </div>
+
+                                <button
+                                    onClick={handleSaveChanges}
+                                    disabled={loading}
+                                    className="w-full btn-primary py-3 flex justify-center items-center gap-2"
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
+                                </button>
 
                                 <div className="border-t border-gray-100 pt-6">
                                     <h4 className="text-sm font-medium text-gray-900 mb-4">Market Prices</h4>
