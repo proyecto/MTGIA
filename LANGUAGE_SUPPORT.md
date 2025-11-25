@@ -76,6 +76,19 @@ Se ha implementado soporte completo para rastrear el idioma de cada carta en la 
 2. Cambiar el idioma en el selector
 3. Guardar los cambios
 
+### Exportación/Importación CSV
+
+**Exportación:**
+- El idioma se incluye automáticamente en el CSV exportado
+- Formato: `name,set_code,collector_number,condition,purchase_price,current_price,quantity,is_foil,language,scryfall_id`
+- Cada idioma se exporta entre comillas para manejar correctamente espacios (ej. "Chinese Simplified")
+
+**Importación:**
+- El sistema detecta automáticamente si el CSV incluye la columna `language`
+- Si la columna existe, se importa el idioma especificado
+- Si la columna no existe (CSV antiguo), se asigna "English" por defecto
+- **Retrocompatibilidad**: Compatible con CSVs antiguos (9 columnas) y nuevos (10 columnas)
+
 ## Migración de Datos
 
 Las cartas existentes en la base de datos se configurarán automáticamente con idioma "English" gracias al valor por defecto en el esquema de la base de datos.

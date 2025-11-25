@@ -238,12 +238,12 @@ pub async fn export_collection(state: State<'_, AppState>) -> Result<String, Str
     let cards = operations::get_all_cards(&db).map_err(|e| e.to_string())?;
 
     // Create CSV header
-    let mut csv = String::from("name,set_code,collector_number,condition,purchase_price,current_price,quantity,is_foil,scryfall_id\n");
+    let mut csv = String::from("name,set_code,collector_number,condition,purchase_price,current_price,quantity,is_foil,language,scryfall_id\n");
 
     // Add each card as a row
     for card in cards {
         csv.push_str(&format!(
-            "\"{}\",{},{},{},{},{},{},{},{}\n",
+            "\"{}\",{},{},{},{},{},{},{},\"{}\",{}\n",
             card.name.replace("\"", "\"\""), // Escape quotes
             card.set_code,
             card.collector_number,
@@ -252,6 +252,7 @@ pub async fn export_collection(state: State<'_, AppState>) -> Result<String, Str
             card.current_price,
             card.quantity,
             if card.is_foil { 1 } else { 0 },
+            card.language.replace("\"", "\"\""), // Escape quotes in language
             card.scryfall_id
         ));
     }
@@ -286,7 +287,7 @@ pub async fn import_collection(
         // Simple CSV parsing (handles quoted fields)
         let parts: Vec<String> = parse_csv_line(line);
 
-        if parts.len() < 9 {
+        if parts.len() < 10 {
             skipped += 1;
             continue;
         }
@@ -299,15 +300,24 @@ pub async fn import_collection(
         let current_price: f64 = parts[5].parse().unwrap_or(0.0);
         let quantity: i32 = parts[6].parse().unwrap_or(1);
         let is_foil = parts[7] == "1" || parts[7].to_lowercase() == "true";
-        let scryfall_id = &parts[8];
+        let language = if parts.len() > 9 {
+            &parts[8]
+        } else {
+            "English"
+        };
+        let scryfall_id = if parts.len() > 9 {
+            &parts[9]
+        } else {
+            &parts[8]
+        };
 
         // Generate a unique ID
         let id = uuid::Uuid::new_v4().to_string();
 
         match db.execute(
-            "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil) 
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
-            rusqlite::params![id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil],
+            "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, language) 
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+            rusqlite::params![id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, language],
         ) {
             Ok(_) => imported += 1,
             Err(_) => skipped += 1,

@@ -1,0 +1,6 @@
+name,set_code,collector_number,condition,purchase_price,current_price,quantity,is_foil,language,scryfall_id
+"Black Lotus",lea,232,NM,1000.00,5000.00,1,0,"English",abc123-def456-ghi789
+"Lightning Bolt",lea,161,LP,5.00,10.00,4,0,"English",xyz789-uvw456-rst123
+"Tarmogoyf",fut,153,NM,50.00,75.00,2,1,"Japanese",jkl012-mno345-pqr678
+"Force of Will",all,42,MP,80.00,120.00,1,0,"English",stu901-vwx234-yza567
+"Snapcaster Mage",isd,78,NM,30.00,45.00,3,0,"Spanish",bcd890-efg123-hij456
