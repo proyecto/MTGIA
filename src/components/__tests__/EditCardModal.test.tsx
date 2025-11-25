@@ -20,6 +20,7 @@ const mockCard: CollectionCard = {
     quantity: 1,
     is_foil: false,
     image_uri: 'https://example.com/image.jpg',
+    language: 'English',
 };
 
 describe('EditCardModal', () => {
@@ -70,7 +71,8 @@ describe('EditCardModal', () => {
         );
 
         // Change condition
-        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'LP' } });
+        const comboboxes = screen.getAllByRole('combobox');
+        fireEvent.change(comboboxes[0], { target: { value: 'LP' } }); // First combobox is condition
 
         // Change price
         fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '1200' } });
@@ -82,6 +84,7 @@ describe('EditCardModal', () => {
             expect(invoke).toHaveBeenCalledWith('update_card_details', {
                 id: mockCard.id,
                 condition: 'LP',
+                language: 'English',
                 purchasePrice: 1200,
             });
             expect(onCardUpdated).toHaveBeenCalled();

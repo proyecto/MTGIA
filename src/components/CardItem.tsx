@@ -15,6 +15,7 @@ export default function CardItem({
     current_price,
     quantity,
     is_foil,
+    language,
     onClick,
     onEdit,
     onDelete
@@ -54,6 +55,20 @@ export default function CardItem({
                     <div className="flex gap-2 text-xs text-gray-500">
                         <span className="uppercase font-mono bg-gray-100 px-1 rounded">{set_code}</span>
                         <span>{condition}</span>
+                        {language && language !== 'English' && (
+                            <span className="bg-blue-100 text-blue-700 px-1 rounded" title={`Language: ${language}`}>
+                                {language === 'Spanish' ? '🇪🇸' :
+                                    language === 'Japanese' ? '🇯🇵' :
+                                        language === 'German' ? '🇩🇪' :
+                                            language === 'French' ? '🇫🇷' :
+                                                language === 'Italian' ? '🇮🇹' :
+                                                    language === 'Portuguese' ? '🇵🇹' :
+                                                        language === 'Russian' ? '🇷🇺' :
+                                                            language === 'Korean' ? '🇰🇷' :
+                                                                language === 'Chinese Simplified' ? '🇨🇳' :
+                                                                    language === 'Chinese Traditional' ? '🇹🇼' : '🌐'}
+                            </span>
+                        )}
                     </div>
                     <div className="text-xs font-medium text-gray-400">
                         x{quantity}

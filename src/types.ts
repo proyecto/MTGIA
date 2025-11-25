@@ -37,6 +37,7 @@ export interface CollectionCard {
     quantity: number;
     is_foil: boolean;
     image_uri?: string;
+    language: string;
 }
 
 export interface AddCardArgs {
@@ -45,6 +46,7 @@ export interface AddCardArgs {
     purchase_price: number;
     quantity: number;
     is_foil: boolean;
+    language: string;
 }
 
 export interface ScryfallSet {

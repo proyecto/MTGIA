@@ -19,6 +19,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
     // Form state
     const [quantity, setQuantity] = useState(1);
     const [condition, setCondition] = useState('NM');
+    const [language, setLanguage] = useState('English');
     const [isFoil, setIsFoil] = useState(false);
     const [price, setPrice] = useState(0);
 
@@ -64,6 +65,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             purchase_price: price,
             quantity,
             is_foil: isFoil,
+            language,
         };
 
         try {
@@ -85,6 +87,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
         setSelectedCard(null);
         setQuantity(1);
         setCondition('NM');
+        setLanguage('English');
         setIsFoil(false);
         onClose();
     }
@@ -177,6 +180,27 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
                                         <option value="MP">Moderately Played (MP)</option>
                                         <option value="HP">Heavily Played (HP)</option>
                                         <option value="DMG">Damaged (DMG)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Language</label>
+                                    <select
+                                        value={language}
+                                        onChange={(e) => setLanguage(e.target.value)}
+                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                    >
+                                        <option value="English">English</option>
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="Japanese">Japanese</option>
+                                        <option value="German">German</option>
+                                        <option value="French">French</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Portuguese">Portuguese</option>
+                                        <option value="Russian">Russian</option>
+                                        <option value="Korean">Korean</option>
+                                        <option value="Chinese Simplified">Chinese Simplified</option>
+                                        <option value="Chinese Traditional">Chinese Traditional</option>
                                     </select>
                                 </div>
 

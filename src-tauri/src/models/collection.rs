@@ -13,4 +13,5 @@ pub struct CollectionCard {
     pub quantity: i32,
     pub is_foil: bool,
     pub image_uri: Option<String>,
+    pub language: String,
 }

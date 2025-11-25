@@ -11,11 +11,13 @@ interface EditCardModalProps {
 
 export default function EditCardModal({ isOpen, onClose, onCardUpdated, card }: EditCardModalProps) {
     const [condition, setCondition] = useState('NM');
+    const [language, setLanguage] = useState('English');
     const [purchasePrice, setPurchasePrice] = useState(0);
 
     useEffect(() => {
         if (card) {
             setCondition(card.condition);
+            setLanguage(card.language || 'English');
             setPurchasePrice(card.purchase_price);
         }
     }, [card]);
@@ -27,6 +29,7 @@ export default function EditCardModal({ isOpen, onClose, onCardUpdated, card }: 
             await invoke('update_card_details', {
                 id: card.id,
                 condition,
+                language,
                 purchasePrice,
             });
             onCardUpdated();
@@ -70,6 +73,27 @@ export default function EditCardModal({ isOpen, onClose, onCardUpdated, card }: 
                             <option value="MP">Moderately Played (MP)</option>
                             <option value="HP">Heavily Played (HP)</option>
                             <option value="DMG">Damaged (DMG)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Language</label>
+                        <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
+                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                        >
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="German">German</option>
+                            <option value="French">French</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Portuguese">Portuguese</option>
+                            <option value="Russian">Russian</option>
+                            <option value="Korean">Korean</option>
+                            <option value="Chinese Simplified">Chinese Simplified</option>
+                            <option value="Chinese Traditional">Chinese Traditional</option>
                         </select>
                     </div>
 

@@ -20,6 +20,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
     // Collection Form State
     const [quantity, setQuantity] = useState(1);
     const [condition, setCondition] = useState('NM');
+    const [language, setLanguage] = useState('English');
     const [isFoil, setIsFoil] = useState(false);
     const [price, setPrice] = useState(0);
 
@@ -30,6 +31,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
 
     // View mode editable state
     const [editCondition, setEditCondition] = useState('NM');
+    const [editLanguage, setEditLanguage] = useState('English');
     const [editPurchasePrice, setEditPurchasePrice] = useState(0);
 
     useEffect(() => {
@@ -47,6 +49,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
         // Initialize editable fields from collectionCard
         if (collectionCard) {
             setEditCondition(collectionCard.condition);
+            setEditLanguage(collectionCard.language || 'English');
             setEditPurchasePrice(collectionCard.purchase_price);
         }
     }, [collectionCard]);
@@ -59,6 +62,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
             purchase_price: price,
             quantity,
             is_foil: isFoil,
+            language,
         };
 
         try {
@@ -102,6 +106,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
             await invoke('update_card_details', {
                 id: collectionCard.id,
                 condition: editCondition,
+                language: editLanguage,
                 purchasePrice: editPurchasePrice,
             });
             if (onCardAdded) onCardAdded(); // Refresh collection
@@ -217,6 +222,26 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         </select>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-lg">
+                                        <span className="block text-xs text-gray-500 uppercase mb-2">Language</span>
+                                        <select
+                                            value={editLanguage}
+                                            onChange={(e) => setEditLanguage(e.target.value)}
+                                            className="w-full text-lg font-bold text-gray-900 bg-white border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-accent-blue focus:border-transparent"
+                                        >
+                                            <option value="English">English</option>
+                                            <option value="Spanish">Spanish</option>
+                                            <option value="Japanese">Japanese</option>
+                                            <option value="German">German</option>
+                                            <option value="French">French</option>
+                                            <option value="Italian">Italian</option>
+                                            <option value="Portuguese">Portuguese</option>
+                                            <option value="Russian">Russian</option>
+                                            <option value="Korean">Korean</option>
+                                            <option value="Chinese Simplified">Chinese Simplified</option>
+                                            <option value="Chinese Traditional">Chinese Traditional</option>
+                                        </select>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
                                         <span className="block text-xs text-gray-500 uppercase mb-2">Purchase Price</span>
                                         <input
                                             type="number"
@@ -285,6 +310,28 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         <option value="MP">Moderately Played (MP)</option>
                                         <option value="HP">Heavily Played (HP)</option>
                                         <option value="DMG">Damaged (DMG)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                                    <select
+                                        id="language"
+                                        value={language}
+                                        onChange={(e) => setLanguage(e.target.value)}
+                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                    >
+                                        <option value="English">English</option>
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="Japanese">Japanese</option>
+                                        <option value="German">German</option>
+                                        <option value="French">French</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Portuguese">Portuguese</option>
+                                        <option value="Russian">Russian</option>
+                                        <option value="Korean">Korean</option>
+                                        <option value="Chinese Simplified">Chinese Simplified</option>
+                                        <option value="Chinese Traditional">Chinese Traditional</option>
                                     </select>
                                 </div>
 

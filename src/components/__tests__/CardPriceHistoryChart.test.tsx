@@ -39,7 +39,7 @@ describe('CardPriceHistoryChart', () => {
         mockInvoke.mockImplementation(() => new Promise(() => { })); // Never resolves
         renderWithSettings(<CardPriceHistoryChart cardId="test-card-id" />);
 
-        expect(screen.getByText((content, element) => {
+        expect(screen.getByText((_content, element) => {
             return element?.className?.includes('animate-spin') || false;
         })).toBeInTheDocument();
     });

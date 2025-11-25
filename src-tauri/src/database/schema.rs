@@ -26,6 +26,7 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
             quantity INTEGER DEFAULT 1,
             is_foil BOOLEAN DEFAULT 0,
             image_uri TEXT,
+            language TEXT DEFAULT 'English',
             FOREIGN KEY(set_code) REFERENCES sets(code)
         )",
         [],
@@ -60,6 +61,35 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
         )",
         [],
     )?;
+
+    Ok(())
+}
+
+pub fn migrate_database(conn: &Connection) -> Result<()> {
+    // Check if language column exists, if not add it
+    let column_exists: Result<i32> = conn.query_row(
+        "SELECT COUNT(*) FROM pragma_table_info('cards') WHERE name='language'",
+        [],
+        |row| row.get(0),
+    );
+
+    match column_exists {
+        Ok(0) => {
+            // Column doesn't exist, add it
+            conn.execute(
+                "ALTER TABLE cards ADD COLUMN language TEXT DEFAULT 'English'",
+                [],
+            )?;
+            println!("Migration: Added 'language' column to cards table");
+        }
+        Ok(_) => {
+            // Column already exists
+            println!("Migration: 'language' column already exists");
+        }
+        Err(e) => {
+            println!("Migration check failed: {}", e);
+        }
+    }
 
     Ok(())
 }

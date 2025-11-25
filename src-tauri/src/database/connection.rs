@@ -1,7 +1,7 @@
+use crate::database::schema::{create_tables, migrate_database};
 use rusqlite::{Connection, Result};
-use std::path::Path;
 use std::fs;
-use crate::database::schema::create_tables;
+use std::path::Path;
 
 pub fn init_db<P: AsRef<Path>>(path: P) -> Result<Connection> {
     // Ensure directory exists
@@ -12,12 +12,15 @@ pub fn init_db<P: AsRef<Path>>(path: P) -> Result<Connection> {
     }
 
     let conn = Connection::open(path)?;
-    
+
     // Enable foreign keys
     conn.execute("PRAGMA foreign_keys = ON;", [])?;
-    
+
     // Create tables
     create_tables(&conn)?;
-    
+
+    // Run migrations for existing databases
+    migrate_database(&conn)?;
+
     Ok(conn)
 }

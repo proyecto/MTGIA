@@ -57,8 +57,8 @@ pub fn insert_card(
         .unwrap_or_default();
 
     conn.execute(
-        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
         params![
             id,
             args.scryfall_id,
@@ -70,7 +70,8 @@ pub fn insert_card(
             args.purchase_price, // Initially same as purchase price
             args.quantity,
             args.is_foil,
-            image_uri
+            image_uri,
+            args.language
         ],
     )?;
     Ok(())
@@ -78,7 +79,7 @@ pub fn insert_card(
 
 pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection::CollectionCard>> {
     let mut stmt = conn.prepare(
-        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri
+        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language
          FROM cards",
     )?;
 
@@ -95,6 +96,7 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
             quantity: row.get(8)?,
             is_foil: row.get(9)?,
             image_uri: row.get(10)?,
+            language: row.get(11)?,
         })
     })?;
 
@@ -158,11 +160,12 @@ pub fn update_card_details(
     conn: &Connection,
     id: &str,
     condition: &str,
+    language: &str,
     purchase_price: f64,
 ) -> Result<()> {
     conn.execute(
-        "UPDATE cards SET condition = ?1, purchase_price = ?2 WHERE id = ?3",
-        params![condition, purchase_price, id],
+        "UPDATE cards SET condition = ?1, purchase_price = ?2, language = ?3 WHERE id = ?4",
+        params![condition, purchase_price, language, id],
     )?;
     Ok(())
 }
@@ -501,6 +504,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         let result = insert_card(&conn, "test-uuid-1", &card, &args, "USD");
@@ -523,6 +527,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -545,6 +550,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -567,6 +573,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         // Insert card
@@ -624,6 +631,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         // Insert card
@@ -677,15 +685,17 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
 
-        let result = update_card_details(&conn, "test-uuid-1", "LP", 15.0);
+        let result = update_card_details(&conn, "test-uuid-1", "LP", "Japanese", 15.0);
         assert!(result.is_ok());
 
         let cards = get_all_cards(&conn).unwrap();
         assert_eq!(cards[0].condition, "LP");
+        assert_eq!(cards[0].language, "Japanese");
         assert_eq!(cards[0].purchase_price, 15.0);
     }
 
@@ -700,6 +710,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         // Insert card
@@ -745,6 +756,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
 
         // Insert card but no price history
@@ -770,6 +782,7 @@ mod tests {
             purchase_price: 10.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
         insert_card(&conn, "uuid-1", &card1, &args1, "USD").unwrap();
         update_card_price(&conn, "uuid-1", 20.0).unwrap();
@@ -784,6 +797,7 @@ mod tests {
             purchase_price: 20.0,
             quantity: 1,
             is_foil: false,
+            language: "English".to_string(),
         };
         insert_card(&conn, "uuid-2", &card2, &args2, "USD").unwrap();
         update_card_price(&conn, "uuid-2", 10.0).unwrap();

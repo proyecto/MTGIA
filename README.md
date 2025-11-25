@@ -4,7 +4,8 @@ A powerful, modern desktop application for managing your Magic: The Gathering ca
 
 ## 🚀 Features
 
-- **Collection Management**: Easily add cards to your collection, track quantities, conditions (Mint, Near Mint, etc.), and foil status.
+- **Collection Management**: Easily add cards to your collection, track quantities, conditions (Mint, Near Mint, etc.), foil status, and language.
+- **Language Support**: Track cards in 11 different languages including English, Spanish, Japanese, German, French, Italian, Portuguese, Russian, Korean, and Chinese (Simplified/Traditional).
 - **Price History**: Track price trends for individual cards and your entire collection over time.
 - **Profitability Analysis**: View detailed ROI reports, top winners/losers, and export data to CSV.
 - **Portfolio Tracking**: Monitor the total value of your collection with real-time pricing data.
