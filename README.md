@@ -5,6 +5,8 @@ A powerful, modern desktop application for managing your Magic: The Gathering ca
 ## 🚀 Features
 
 - **Collection Management**: Easily add cards to your collection, track quantities, conditions (Mint, Near Mint, etc.), and foil status.
+- **Price History**: Track price trends for individual cards and your entire collection over time.
+- **Profitability Analysis**: View detailed ROI reports, top winners/losers, and export data to CSV.
 - **Portfolio Tracking**: Monitor the total value of your collection with real-time pricing data.
 - **Wishlist**: Keep track of cards you want to acquire. Set target prices, priorities, and add notes.
 - **Set Browser**: Explore all Magic: The Gathering sets and view cards within them.

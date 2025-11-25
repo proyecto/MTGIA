@@ -69,3 +69,37 @@ export interface WishlistCard {
     added_date: string;
     priority: number;
 }
+
+export interface CardPriceHistoryPoint {
+    date: string;
+    price: number;
+    currency: string;
+}
+
+export interface PriceStats {
+    min: number;
+    max: number;
+    average: number;
+    current: number;
+    change_percent: number;
+}
+
+export interface CardPerformance {
+    id: string;
+    name: string;
+    set_code: string;
+    quantity: number;
+    purchase_price: number;
+    current_price: number;
+    total_gain: number;
+    roi_percentage: number;
+}
+
+export interface CollectionStats {
+    total_investment: number;
+    total_value: number;
+    total_gain: number;
+    total_roi_percentage: number;
+    top_winners: CardPerformance[];
+    top_losers: CardPerformance[];
+}

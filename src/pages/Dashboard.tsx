@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useSettings } from '../contexts/SettingsContext';
 import PortfolioChart from '../components/PortfolioChart';
+import ProfitabilityReport from '../components/ProfitabilityReport';
 
 export default function Dashboard() {
     const { currency } = useSettings();
@@ -68,6 +69,11 @@ export default function Dashboard() {
             <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Portfolio Value Over Time</h2>
                 <PortfolioChart />
+            </section>
+
+            {/* Profitability Report */}
+            <section>
+                <ProfitabilityReport />
             </section>
         </div>
     );

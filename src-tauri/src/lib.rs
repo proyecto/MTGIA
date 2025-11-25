@@ -67,8 +67,10 @@ pub fn run() {
             commands::collection::update_prices,
             commands::collection::update_card_details,
             commands::collection::get_portfolio_history,
+            commands::collection::get_card_price_history,
             commands::collection::export_collection,
             commands::collection::import_collection,
+            commands::analytics::get_collection_stats,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

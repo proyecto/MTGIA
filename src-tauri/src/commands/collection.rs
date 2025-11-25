@@ -214,6 +214,19 @@ pub async fn get_portfolio_history(
 }
 
 #[tauri::command]
+pub async fn get_card_price_history(
+    state: State<'_, AppState>,
+    card_id: String,
+) -> Result<Vec<operations::CardPriceHistoryPoint>, String> {
+    let db = state
+        .db
+        .lock()
+        .map_err(|_| "Failed to lock db".to_string())?;
+
+    operations::get_card_price_history(&db, &card_id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub async fn export_collection(state: State<'_, AppState>) -> Result<String, String> {
     let db = state
         .db

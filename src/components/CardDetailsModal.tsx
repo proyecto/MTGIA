@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ScryfallCard, AddCardArgs, CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
+import CardPriceHistoryChart from './CardPriceHistoryChart';
 
 interface CardDetailsModalProps {
     card: ScryfallCard;
@@ -259,6 +260,14 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                             <span className="font-medium">{card.prices.eur_foil ? `€${card.prices.eur_foil}` : 'N/A'}</span>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-6">
+                                    <h4 className="text-sm font-medium text-gray-900 mb-4">Price History</h4>
+                                    <CardPriceHistoryChart
+                                        cardId={collectionCard.id}
+                                        purchasePrice={collectionCard.purchase_price}
+                                    />
                                 </div>
                             </div>
                         ) : activeTab === 'collection' ? (

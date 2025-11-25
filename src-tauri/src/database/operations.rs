@@ -252,6 +252,113 @@ pub fn update_wishlist_card(
     Ok(())
 }
 
+#[derive(Debug, serde::Serialize)]
+pub struct CardPriceHistoryPoint {
+    pub date: String,
+    pub price: f64,
+    pub currency: String,
+}
+
+pub fn get_card_price_history(
+    conn: &Connection,
+    card_id: &str,
+) -> Result<Vec<CardPriceHistoryPoint>> {
+    let mut stmt = conn.prepare(
+        "SELECT date, price, currency
+         FROM price_history
+         WHERE card_id = ?1
+         ORDER BY date ASC",
+    )?;
+
+    let history_iter = stmt.query_map([card_id], |row| {
+        Ok(CardPriceHistoryPoint {
+            date: row.get(0)?,
+            price: row.get(1)?,
+            currency: row.get(2)?,
+        })
+    })?;
+
+    let mut history = Vec::new();
+    for point in history_iter {
+        history.push(point?);
+    }
+
+    Ok(history)
+}
+
+pub fn get_collection_stats(
+    conn: &Connection,
+) -> Result<crate::models::analytics::CollectionStats> {
+    let cards = get_all_cards(conn)?;
+
+    let mut total_investment = 0.0;
+    let mut total_value = 0.0;
+    let mut performances = Vec::new();
+
+    for card in cards {
+        let investment = card.purchase_price * card.quantity as f64;
+        let value = card.current_price * card.quantity as f64;
+        let gain = value - investment;
+
+        // Avoid division by zero for ROI
+        let roi = if investment > 0.0 {
+            (gain / investment) * 100.0
+        } else if value > 0.0 {
+            100.0 // Infinite ROI technically, but cap at 100% for display or treat as special case
+        } else {
+            0.0
+        };
+
+        total_investment += investment;
+        total_value += value;
+
+        performances.push(crate::models::analytics::CardPerformance {
+            id: card.id,
+            name: card.name,
+            set_code: card.set_code,
+            quantity: card.quantity,
+            purchase_price: card.purchase_price,
+            current_price: card.current_price,
+            total_gain: gain,
+            roi_percentage: roi,
+        });
+    }
+
+    let total_gain = total_value - total_investment;
+    let total_roi = if total_investment > 0.0 {
+        (total_gain / total_investment) * 100.0
+    } else {
+        0.0
+    };
+
+    // Sort by gain for winners (descending)
+    let mut winners = performances.clone();
+    winners.sort_by(|a, b| {
+        b.total_gain
+            .partial_cmp(&a.total_gain)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    let top_winners = winners.into_iter().take(5).collect();
+
+    // Sort by gain for losers (ascending)
+    let mut losers = performances.clone();
+    losers.sort_by(|a, b| {
+        a.total_gain
+            .partial_cmp(&b.total_gain)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    let top_losers = losers.into_iter().take(5).collect();
+
+    Ok(crate::models::analytics::CollectionStats {
+        total_investment,
+        total_value,
+        total_gain,
+        total_roi_percentage: total_roi,
+        top_winners,
+        top_losers,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -465,9 +572,17 @@ mod tests {
         // Insert card
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
 
-        // Add some price history
-        insert_price_history(&conn, "test-uuid-1", 15.0, "USD").unwrap();
-        insert_price_history(&conn, "test-uuid-1", 20.0, "USD").unwrap();
+        // Add some price history manually to ensure different dates
+        conn.execute(
+            "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
+            params!["test-uuid-1", "2024-01-01", 15.0, "USD"],
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
+            params!["test-uuid-1", "2024-01-02", 20.0, "USD"],
+        )
+        .unwrap();
 
         // Verify price history exists
         let history_count: i64 = conn
@@ -572,5 +687,120 @@ mod tests {
         let cards = get_all_cards(&conn).unwrap();
         assert_eq!(cards[0].condition, "LP");
         assert_eq!(cards[0].purchase_price, 15.0);
+    }
+
+    #[test]
+    fn test_get_card_price_history() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        // Insert card
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        // Add multiple price history entries
+        insert_price_history(&conn, "test-uuid-1", 10.0, "USD").unwrap();
+
+        // Manually insert entries with different dates for testing
+        conn.execute(
+            "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
+            params!["test-uuid-1", "2024-01-01", 12.0, "USD"],
+        )
+        .unwrap();
+
+        conn.execute(
+            "INSERT INTO price_history (card_id, date, price, currency) VALUES (?1, ?2, ?3, ?4)",
+            params!["test-uuid-1", "2024-01-02", 15.0, "USD"],
+        )
+        .unwrap();
+
+        // Get price history
+        let history = get_card_price_history(&conn, "test-uuid-1").unwrap();
+
+        // Should have 3 entries (today's + 2 manual)
+        assert!(history.len() >= 2);
+
+        // Verify ordering (ascending by date)
+        assert_eq!(history[0].date, "2024-01-01");
+        assert_eq!(history[0].price, 12.0);
+        assert_eq!(history[1].date, "2024-01-02");
+        assert_eq!(history[1].price, 15.0);
+    }
+
+    #[test]
+    fn test_get_card_price_history_empty() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+
+        // Insert card but no price history
+        insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
+
+        // Get price history
+        let history = get_card_price_history(&conn, "test-uuid-1").unwrap();
+
+        // Should be empty
+        assert_eq!(history.len(), 0);
+    }
+
+    #[test]
+    fn test_get_collection_stats() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        let card1 = create_test_card();
+
+        // Card 1: Bought for 10, now 20 (Gain 10, ROI 100%)
+        let args1 = AddCardArgs {
+            scryfall_id: card1.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+        };
+        insert_card(&conn, "uuid-1", &card1, &args1, "USD").unwrap();
+        update_card_price(&conn, "uuid-1", 20.0).unwrap();
+
+        // Card 2: Bought for 20, now 10 (Loss 10, ROI -50%)
+        let mut card2 = create_test_card();
+        card2.id = "uuid-2".to_string();
+        card2.name = "Loser Card".to_string();
+        let args2 = AddCardArgs {
+            scryfall_id: card2.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 20.0,
+            quantity: 1,
+            is_foil: false,
+        };
+        insert_card(&conn, "uuid-2", &card2, &args2, "USD").unwrap();
+        update_card_price(&conn, "uuid-2", 10.0).unwrap();
+
+        let stats = get_collection_stats(&conn).unwrap();
+
+        assert_eq!(stats.total_investment, 30.0);
+        assert_eq!(stats.total_value, 30.0);
+        assert_eq!(stats.total_gain, 0.0);
+        assert_eq!(stats.total_roi_percentage, 0.0);
+
+        assert_eq!(stats.top_winners.len(), 2);
+        assert_eq!(stats.top_winners[0].name, "Test Card");
+        assert_eq!(stats.top_winners[0].total_gain, 10.0);
+
+        assert_eq!(stats.top_losers.len(), 2);
+        assert_eq!(stats.top_losers[0].name, "Loser Card"); // Most negative gain first
+        assert_eq!(stats.top_losers[0].total_gain, -10.0);
     }
 }
