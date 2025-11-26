@@ -91,6 +91,28 @@ pub async fn get_card(scryfall_id: String) -> Result<ScryfallCard, String> {
         .map_err(|e| e.to_string())
 }
 
+/// Fetches available languages for a specific card in a set.
+///
+/// # Arguments
+///
+/// * `oracle_id` - The Oracle ID of the card.
+/// * `set_code` - The set code.
+///
+/// # Returns
+///
+/// * `Result<Vec<String>, String>` - A list of language codes.
+#[tauri::command]
+pub async fn get_card_languages(
+    oracle_id: String,
+    set_code: String,
+) -> Result<Vec<String>, String> {
+    let service = ScryfallService::new();
+    service
+        .get_card_languages(&oracle_id, &set_code)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 /// Retrieves the entire collection of cards.
 ///
 /// # Arguments
@@ -242,10 +264,14 @@ pub async fn update_card_details(
         .map_err(|e| e.to_string())
 }
 
+/// Represents a data point in the portfolio value history.
 #[derive(serde::Serialize)]
 pub struct PortfolioDataPoint {
+    /// The date of the data point (YYYY-MM-DD).
     date: String,
+    /// The total market value of the collection on this date.
     total_value: f64,
+    /// The total investment cost of the collection on this date.
     total_investment: f64,
 }
 
@@ -455,6 +481,15 @@ pub async fn import_collection(
     ))
 }
 
+/// Parses a single line of CSV content, handling quoted fields.
+///
+/// # Arguments
+///
+/// * `line` - The CSV line to parse.
+///
+/// # Returns
+///
+/// * `Vec<String>` - A vector of fields parsed from the line.
 fn parse_csv_line(line: &str) -> Vec<String> {
     let mut parts = Vec::new();
     let mut current = String::new();

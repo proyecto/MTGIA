@@ -546,7 +546,9 @@ mod tests {
     fn create_test_card() -> ScryfallCard {
         ScryfallCard {
             id: "test-id-123".to_string(),
+            oracle_id: Some("test-oracle-id".to_string()),
             name: "Test Card".to_string(),
+            lang: Some("en".to_string()),
             set: "tst".to_string(),
             set_name: "Test Set".to_string(),
             collector_number: "1".to_string(),

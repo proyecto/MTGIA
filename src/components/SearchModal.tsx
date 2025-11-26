@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { ScryfallCard, AddCardArgs } from '../types';
+import { ScryfallCard, ScryfallCardList, AddCardArgs } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import FinishSelector from './FinishSelector';
+import { LANGUAGE_NAMES } from '../constants';
 
 /**
  * Props for the SearchModal component.
@@ -16,11 +17,7 @@ interface SearchModalProps {
     onCardAdded: (id: string) => void;
 }
 
-interface ScryfallCardList {
-    data: ScryfallCard[];
-    has_more: boolean;
-    total_cards?: number;
-}
+
 
 /**
  * Modal component for searching and adding cards from Scryfall.
@@ -35,6 +32,8 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
     const [totalCards, setTotalCards] = useState<number | undefined>(undefined);
+    const [availableLanguages, setAvailableLanguages] = useState<string[]>(['en']);
+    const [isFetchingLanguages, setIsFetchingLanguages] = useState(false);
 
     // Form state
     const [quantity, setQuantity] = useState(1);
@@ -53,8 +52,51 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
                 priceStr = finish.includes('foil') ? selectedCard.prices.usd_foil : selectedCard.prices.usd;
             }
             setPrice(priceStr ? parseFloat(priceStr) : 0);
+
+            // Fetch available languages
+            fetchLanguages(selectedCard);
         }
     }, [selectedCard, finish, currency]);
+
+    async function fetchLanguages(card: ScryfallCard) {
+        console.log('Fetching languages for:', card.name, 'Oracle ID:', card.oracle_id, 'Set:', card.set);
+        if (!card.oracle_id) {
+            console.log('No Oracle ID, defaulting to English');
+            setAvailableLanguages(['en']);
+            return;
+        }
+
+        setIsFetchingLanguages(true);
+        try {
+            const langs = await invoke<string[]>('get_card_languages', {
+                oracleId: card.oracle_id,
+                setCode: card.set
+            });
+            console.log('Received languages:', langs);
+
+            // Map codes to names for sorting/display, but keep codes for value
+            // If empty (shouldn't happen if card exists), default to English
+            if (langs.length > 0) {
+                setAvailableLanguages(langs);
+                // If current language is not in available languages, switch to first available
+                // Prefer English if available
+                if (langs.includes('en')) {
+                    setLanguage('en');
+                } else if (!langs.includes(language)) {
+                    setLanguage(langs[0]);
+                }
+            } else {
+                console.log('No languages returned, defaulting to English');
+                setAvailableLanguages(['en']);
+                setLanguage('en');
+            }
+        } catch (error) {
+            console.error('Failed to fetch languages:', error);
+            setAvailableLanguages(['en']); // Fallback
+        } finally {
+            setIsFetchingLanguages(false);
+        }
+    }
 
     const search = useCallback(async (searchQuery: string, pageNum: number = 1) => {
         console.log(`Frontend searching: "${searchQuery}" Page: ${pageNum}`);
@@ -118,7 +160,8 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             purchase_price: price,
             quantity,
             is_foil: finish.includes('foil'),
-            language,
+
+            language: LANGUAGE_NAMES[language] || language,
         };
 
         try {
@@ -140,7 +183,10 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
         setSelectedCard(null);
         setQuantity(1);
         setCondition('NM');
-        setLanguage('English');
+        setQuantity(1);
+        setCondition('NM');
+        setLanguage('en');
+        setFinish('nonfoil');
         setFinish('nonfoil');
         setPage(1);
         setHasMore(false);
@@ -262,23 +308,20 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Language</label>
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                                            Language {isFetchingLanguages && <span className="text-gray-400 font-normal">(Loading...)</span>}
+                                        </label>
                                         <select
                                             value={language}
                                             onChange={(e) => setLanguage(e.target.value)}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                            disabled={isFetchingLanguages}
+                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border disabled:bg-gray-100"
                                         >
-                                            <option value="English">English</option>
-                                            <option value="Spanish">Spanish</option>
-                                            <option value="Japanese">Japanese</option>
-                                            <option value="German">German</option>
-                                            <option value="French">French</option>
-                                            <option value="Italian">Italian</option>
-                                            <option value="Portuguese">Portuguese</option>
-                                            <option value="Russian">Russian</option>
-                                            <option value="Korean">Korean</option>
-                                            <option value="Chinese Simplified">Chinese Simplified</option>
-                                            <option value="Chinese Traditional">Chinese Traditional</option>
+                                            {availableLanguages.map(langCode => (
+                                                <option key={langCode} value={langCode}>
+                                                    {LANGUAGE_NAMES[langCode] || langCode.toUpperCase()}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
 
@@ -314,6 +357,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
                                         </div>
 
                                         <button
+                                            data-testid="submit-collection"
                                             onClick={handleAddCard}
                                             className="w-full btn-primary mt-4 flex justify-center items-center gap-2"
                                         >

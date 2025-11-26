@@ -39,6 +39,19 @@ export interface ScryfallCard {
     type_line?: string;
     /** Oracle text (rules text) */
     oracle_text?: string;
+    /** Oracle ID for grouping prints */
+    oracle_id?: string;
+    /** Language code */
+    lang?: string;
+}
+
+/**
+ * Represents a list of cards returned by Scryfall search.
+ */
+export interface ScryfallCardList {
+    data: ScryfallCard[];
+    has_more: boolean;
+    total_cards?: number;
 }
 
 /**

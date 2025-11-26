@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { ScryfallCard, AddCardArgs, CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import CardPriceHistoryChart from './CardPriceHistoryChart';
+import { LANGUAGE_NAMES } from '../constants';
 
 /**
  * Props for the CardDetailsModal component.
@@ -32,7 +33,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
     // Collection Form State
     const [quantity, setQuantity] = useState(1);
     const [condition, setCondition] = useState('NM');
-    const [language, setLanguage] = useState('English');
+    const [language, setLanguage] = useState('en'); // Default to code 'en'
     const [isFoil, setIsFoil] = useState(false);
     const [price, setPrice] = useState(0);
 
@@ -43,8 +44,51 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
 
     // View mode editable state
     const [editCondition, setEditCondition] = useState('NM');
-    const [editLanguage, setEditLanguage] = useState('English');
+    const [editLanguage, setEditLanguage] = useState('en'); // Default to code 'en'
     const [editPurchasePrice, setEditPurchasePrice] = useState(0);
+
+    // Dynamic Language State
+    const [availableLanguages, setAvailableLanguages] = useState<string[]>(['en']);
+    const [isFetchingLanguages, setIsFetchingLanguages] = useState(false);
+
+    useEffect(() => {
+        fetchLanguages();
+    }, [card]);
+
+    async function fetchLanguages() {
+        if (!card.oracle_id) {
+            setAvailableLanguages(['en']);
+            return;
+        }
+
+        setIsFetchingLanguages(true);
+        try {
+            const langs = await invoke<string[]>('get_card_languages', {
+                oracleId: card.oracle_id,
+                setCode: card.set
+            });
+
+            if (langs.length > 0) {
+                setAvailableLanguages(langs);
+                // If adding new card, default to English or first available
+                if (mode === 'add') {
+                    if (langs.includes('en')) {
+                        setLanguage('en');
+                    } else {
+                        setLanguage(langs[0]);
+                    }
+                }
+            } else {
+                setAvailableLanguages(['en']);
+                if (mode === 'add') setLanguage('en');
+            }
+        } catch (error) {
+            console.error('Failed to fetch languages:', error);
+            setAvailableLanguages(['en']);
+        } finally {
+            setIsFetchingLanguages(false);
+        }
+    }
 
     useEffect(() => {
         // Auto-fill price based on selection and currency
@@ -61,8 +105,12 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
         // Initialize editable fields from collectionCard
         if (collectionCard) {
             setEditCondition(collectionCard.condition);
-            setEditLanguage(collectionCard.language || 'English');
             setEditPurchasePrice(collectionCard.purchase_price);
+
+            // Map full name back to code
+            const langName = collectionCard.language || 'English';
+            const langEntry = Object.entries(LANGUAGE_NAMES).find(([_, name]) => name === langName);
+            setEditLanguage(langEntry ? langEntry[0] : 'en');
         }
     }, [collectionCard]);
 
@@ -74,7 +122,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
             purchase_price: price,
             quantity,
             is_foil: isFoil,
-            language,
+            language: LANGUAGE_NAMES[language] || language, // Map code to name
         };
 
         try {
@@ -118,7 +166,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
             await invoke('update_card_details', {
                 id: collectionCard.id,
                 condition: editCondition,
-                language: editLanguage,
+                language: LANGUAGE_NAMES[editLanguage] || editLanguage, // Map code to name
                 purchasePrice: editPurchasePrice,
             });
             if (onCardAdded) onCardAdded(); // Refresh collection
@@ -238,19 +286,14 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         <select
                                             value={editLanguage}
                                             onChange={(e) => setEditLanguage(e.target.value)}
-                                            className="w-full text-lg font-bold text-gray-900 bg-white border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-accent-blue focus:border-transparent"
+                                            disabled={isFetchingLanguages}
+                                            className="w-full text-lg font-bold text-gray-900 bg-white border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-accent-blue focus:border-transparent disabled:opacity-50"
                                         >
-                                            <option value="English">English</option>
-                                            <option value="Spanish">Spanish</option>
-                                            <option value="Japanese">Japanese</option>
-                                            <option value="German">German</option>
-                                            <option value="French">French</option>
-                                            <option value="Italian">Italian</option>
-                                            <option value="Portuguese">Portuguese</option>
-                                            <option value="Russian">Russian</option>
-                                            <option value="Korean">Korean</option>
-                                            <option value="Chinese Simplified">Chinese Simplified</option>
-                                            <option value="Chinese Traditional">Chinese Traditional</option>
+                                            {availableLanguages.map((langCode) => (
+                                                <option key={langCode} value={langCode}>
+                                                    {LANGUAGE_NAMES[langCode] || langCode}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-lg">
@@ -331,19 +374,14 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         id="language"
                                         value={language}
                                         onChange={(e) => setLanguage(e.target.value)}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                        disabled={isFetchingLanguages}
+                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border disabled:opacity-50"
                                     >
-                                        <option value="English">English</option>
-                                        <option value="Spanish">Spanish</option>
-                                        <option value="Japanese">Japanese</option>
-                                        <option value="German">German</option>
-                                        <option value="French">French</option>
-                                        <option value="Italian">Italian</option>
-                                        <option value="Portuguese">Portuguese</option>
-                                        <option value="Russian">Russian</option>
-                                        <option value="Korean">Korean</option>
-                                        <option value="Chinese Simplified">Chinese Simplified</option>
-                                        <option value="Chinese Traditional">Chinese Traditional</option>
+                                        {availableLanguages.map((langCode) => (
+                                            <option key={langCode} value={langCode}>
+                                                {LANGUAGE_NAMES[langCode] || langCode}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 

@@ -1,4 +1,13 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+/// A simple greeting command.
+///
+/// # Arguments
+///
+/// * `name` - The name to greet.
+///
+/// # Returns
+///
+/// * `String` - A greeting message.
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -13,10 +22,20 @@ use rusqlite::Connection;
 use std::sync::Mutex;
 use tauri::Manager;
 
+/// Application state holding the database connection.
 pub struct AppState {
     pub db: Mutex<Connection>,
 }
 
+/// Initializes the database path.
+///
+/// # Arguments
+///
+/// * `app_handle` - The application handle.
+///
+/// # Returns
+///
+/// * `Result<String, String>` - The path to the database or an error message.
 #[tauri::command]
 fn init_db_command(app_handle: tauri::AppHandle) -> Result<String, String> {
     let app_dir = app_handle
@@ -29,6 +48,8 @@ fn init_db_command(app_handle: tauri::AppHandle) -> Result<String, String> {
     Ok(format!("Database initialized at {:?}", db_path))
 }
 
+/// The main entry point for the Tauri application.
+/// Sets up the database, state, and registers commands.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -61,6 +82,7 @@ pub fn run() {
             commands::collection::add_card,
             commands::collection::get_card,
             commands::collection::search_scryfall,
+            commands::collection::get_card_languages,
             commands::collection::get_collection,
             commands::collection::remove_card,
             commands::collection::update_card_quantity,

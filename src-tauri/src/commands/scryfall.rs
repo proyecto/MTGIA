@@ -13,6 +13,17 @@ struct ProgressPayload {
     message: String,
 }
 
+/// Imports all sets from Scryfall into the local database.
+/// Emits progress events to the frontend.
+///
+/// # Arguments
+///
+/// * `app` - The application handle to emit events.
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<String, String>` - A summary message or an error string.
 #[tauri::command]
 pub async fn import_sets(app: AppHandle, state: State<'_, AppState>) -> Result<String, String> {
     let service = ScryfallService::new();
@@ -49,6 +60,16 @@ pub async fn import_sets(app: AppHandle, state: State<'_, AppState>) -> Result<S
     Ok(format!("Imported {} sets", count))
 }
 
+/// Retrieves all sets from the local database.
+/// If the database is empty, it fetches them from Scryfall first.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<Vec<ScryfallSet>, String>` - A list of sets or an error string.
 #[tauri::command]
 pub async fn get_sets(
     state: State<'_, AppState>,

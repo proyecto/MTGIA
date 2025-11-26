@@ -33,6 +33,7 @@ const mockCard = {
     },
     type_line: 'Creature — Test',
     oracle_text: 'Test oracle text',
+    oracle_id: 'test-oracle-id',
 };
 
 describe('CardDetailsModal', () => {
@@ -72,9 +73,46 @@ describe('CardDetailsModal', () => {
         expect(screen.getByText(/Purchase Price \([€$]\)/)).toBeInTheDocument();
     });
 
+    it('fetches and displays available languages', async () => {
+        const { invoke } = await import('@tauri-apps/api/core');
+        vi.mocked(invoke).mockImplementation((cmd, args: any) => {
+            if (cmd === 'get_card_languages') {
+                if (args.oracleId === mockCard.oracle_id) {
+                    return Promise.resolve(['en', 'es', 'ja']);
+                }
+                return Promise.resolve([]);
+            }
+            return Promise.resolve(undefined);
+        });
+
+        render(
+            <SettingsProvider>
+                <CardDetailsModal card={mockCard} onClose={() => { }} />
+            </SettingsProvider>
+        );
+
+        await waitFor(() => {
+            expect(invoke).toHaveBeenCalledWith('get_card_languages', {
+                oracleId: mockCard.oracle_id,
+                setCode: mockCard.set
+            });
+        });
+
+        // Check if languages are populated in the dropdown
+        const languageSelect = screen.getByLabelText('Language');
+        fireEvent.click(languageSelect);
+
+        expect(screen.getByText('English')).toBeInTheDocument();
+        expect(screen.getByText('Spanish')).toBeInTheDocument();
+        expect(screen.getByText('Japanese')).toBeInTheDocument();
+    });
+
     it('submits add to collection form', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockResolvedValue(undefined);
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_card_languages') return Promise.resolve(['en']);
+            return Promise.resolve(undefined);
+        });
         const onClose = vi.fn();
         const onCardAdded = vi.fn();
 
@@ -97,6 +135,7 @@ describe('CardDetailsModal', () => {
                 args: expect.objectContaining({
                     scryfall_id: mockCard.id,
                     quantity: 2,
+                    language: 'English', // Default
                 })
             }));
             expect(onCardAdded).toHaveBeenCalled();
@@ -106,7 +145,10 @@ describe('CardDetailsModal', () => {
 
     it('submits add to wishlist form', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockResolvedValue(undefined);
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_card_languages') return Promise.resolve(['en']);
+            return Promise.resolve(undefined);
+        });
         const onClose = vi.fn();
         const onCardAdded = vi.fn();
 
@@ -137,3 +179,4 @@ describe('CardDetailsModal', () => {
         });
     });
 });
+
