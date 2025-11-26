@@ -531,6 +531,86 @@ pub fn get_collection_stats(
     })
 }
 
+// ============ Tag Operations ============
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct Tag {
+    pub id: i32,
+    pub name: String,
+    pub color: String,
+}
+
+pub fn create_tag(conn: &Connection, name: &str, color: &str) -> Result<i32> {
+    conn.execute(
+        "INSERT INTO tags (name, color) VALUES (?1, ?2)",
+        params![name, color],
+    )?;
+    let id = conn.last_insert_rowid() as i32;
+    Ok(id)
+}
+
+pub fn delete_tag(conn: &Connection, id: i32) -> Result<()> {
+    conn.execute("DELETE FROM tags WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
+pub fn get_all_tags(conn: &Connection) -> Result<Vec<Tag>> {
+    let mut stmt = conn.prepare("SELECT id, name, color FROM tags ORDER BY name ASC")?;
+    let tag_iter = stmt.query_map([], |row| {
+        Ok(Tag {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            color: row.get(2)?,
+        })
+    })?;
+
+    let mut tags = Vec::new();
+    for tag in tag_iter {
+        tags.push(tag?);
+    }
+    Ok(tags)
+}
+
+pub fn add_tag_to_card(conn: &Connection, card_id: &str, tag_id: i32) -> Result<()> {
+    conn.execute(
+        "INSERT OR IGNORE INTO card_tags (card_id, tag_id) VALUES (?1, ?2)",
+        params![card_id, tag_id],
+    )?;
+    Ok(())
+}
+
+pub fn remove_tag_from_card(conn: &Connection, card_id: &str, tag_id: i32) -> Result<()> {
+    conn.execute(
+        "DELETE FROM card_tags WHERE card_id = ?1 AND tag_id = ?2",
+        params![card_id, tag_id],
+    )?;
+    Ok(())
+}
+
+pub fn get_card_tags(conn: &Connection, card_id: &str) -> Result<Vec<Tag>> {
+    let mut stmt = conn.prepare(
+        "SELECT t.id, t.name, t.color 
+         FROM tags t
+         JOIN card_tags ct ON t.id = ct.tag_id
+         WHERE ct.card_id = ?1
+         ORDER BY t.name ASC",
+    )?;
+
+    let tag_iter = stmt.query_map([card_id], |row| {
+        Ok(Tag {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            color: row.get(2)?,
+        })
+    })?;
+
+    let mut tags = Vec::new();
+    for tag in tag_iter {
+        tags.push(tag?);
+    }
+    Ok(tags)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

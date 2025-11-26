@@ -202,6 +202,50 @@ impl ScryfallService {
 
         Ok(languages)
     }
+    /// Fetches top cards based on a query and sort order.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - The search query.
+    /// * `order` - The sort order (e.g., "usd", "edhrec").
+    /// * `dir` - The sort direction ("asc" or "desc").
+    /// * `limit` - The number of cards to return.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Vec<crate::models::scryfall::ScryfallCard>, Box<dyn Error>>`
+    pub async fn get_top_cards(
+        &self,
+        query: &str,
+        order: &str,
+        dir: &str,
+        limit: usize,
+    ) -> Result<Vec<crate::models::scryfall::ScryfallCard>, Box<dyn Error>> {
+        let url = format!("{}/cards/search", self.base_url);
+        println!("Fetching top cards: {} order:{} dir:{}", query, order, dir);
+
+        let resp = self
+            .client
+            .get(&url)
+            .query(&[
+                ("q", query),
+                ("order", order),
+                ("dir", dir),
+                ("unique", "prints"), // Use prints to get specific versions if needed, or cards for unique names
+            ])
+            .send()
+            .await?;
+
+        if resp.status() == reqwest::StatusCode::NOT_FOUND {
+            return Ok(vec![]);
+        }
+
+        let list: crate::models::scryfall::ScryfallCardList = resp.json().await?;
+
+        // Take only the requested limit
+        let cards = list.data.into_iter().take(limit).collect();
+        Ok(cards)
+    }
 }
 
 #[cfg(test)]

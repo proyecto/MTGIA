@@ -5,6 +5,7 @@ import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import AllSets from "./pages/AllSets";
 import Wishlist from "./pages/Wishlist";
+import MarketTrends from "./pages/MarketTrends";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./App.css";
@@ -21,6 +22,7 @@ function App() {
           {activeTab === "decks" && <Dashboard />}
           {activeTab === "allsets" && <AllSets />}
           {activeTab === "wishlist" && <Wishlist />}
+          {activeTab === "market" && <MarketTrends />}
         </MainLayout>
       </SettingsProvider>
     </ErrorBoundary>

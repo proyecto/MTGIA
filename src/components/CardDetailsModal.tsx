@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { ScryfallCard, AddCardArgs, CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import CardPriceHistoryChart from './CardPriceHistoryChart';
+import TagSelector from './TagSelector';
 import { LANGUAGE_NAMES } from '../constants';
 
 /**
@@ -310,6 +311,11 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         <span className="block text-xs text-gray-500 uppercase mb-1">Current Value</span>
                                         <span className="text-2xl font-bold text-accent-blue">{formatPrice(collectionCard.current_price)}</span>
                                     </div>
+                                </div>
+
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <span className="block text-xs text-gray-500 uppercase mb-2">Tags</span>
+                                    <TagSelector cardId={collectionCard.id} />
                                 </div>
 
                                 <button

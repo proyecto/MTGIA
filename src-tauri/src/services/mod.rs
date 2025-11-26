@@ -1,2 +1,3 @@
-pub mod scryfall;
+pub mod import;
 pub mod prices;
+pub mod scryfall;

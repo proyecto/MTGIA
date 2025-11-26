@@ -309,20 +309,14 @@
 - 📋 Tendencias globales del mercado
 - 📋 Desglose por formato (Modern, Commander, etc.)
 
-### Deck Building
-- 📋 Constructor de mazos
-- 📋 Sugerencias basadas en colección
-- 📋 Análisis de mazo (curva de maná, etc.)
-- 📋 Lista de faltantes para mazos
-
 ### UX
-- 📋 Vista de carpeta (binder view)
+
 - 📋 Temas de color personalizables
 - 📋 Búsqueda avanzada con sintaxis Scryfall
 
 ### Utilidades
-- 📋 Simulador de sobres
-- 📋 Contador de vidas
+
+
 - 📋 Sincronización en la nube
 
 ---

@@ -172,3 +172,12 @@ export interface CollectionStats {
     top_winners: CardPerformance[];
     top_losers: CardPerformance[];
 }
+
+/**
+ * Represents a custom tag for organizing cards.
+ */
+export interface Tag {
+    id: number;
+    name: string;
+    color: string;
+}

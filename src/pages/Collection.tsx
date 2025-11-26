@@ -5,6 +5,7 @@ import CardItem from '../components/CardItem';
 import StatisticsModal from '../components/StatisticsModal';
 import EditCardModal from '../components/EditCardModal';
 import CardDetailsModal from '../components/CardDetailsModal';
+import ScannerModal from '../components/ScannerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { CollectionCard, ScryfallCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
@@ -31,6 +32,7 @@ export default function Collection() {
     const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
     const [selectedCollectionCard, setSelectedCollectionCard] = useState<CollectionCard | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     useEffect(() => {
         loadCollection();
@@ -141,6 +143,12 @@ export default function Collection() {
                     >
                         <span className="text-lg">📊</span> View Stats
                     </button>
+                    <button
+                        onClick={() => setIsScannerOpen(true)}
+                        className="text-sm font-medium text-accent-blue hover:text-blue-700 flex items-center gap-1"
+                    >
+                        <span className="text-lg">📷</span> Scan
+                    </button>
                     <div className="text-right">
                         <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">Total Value</p>
                         <p className="text-2xl font-bold text-accent-blue">{formatPrice(totalValue)}</p>
@@ -237,6 +245,13 @@ export default function Collection() {
                 onConfirm={confirmDelete}
                 onCancel={cancelDelete}
             />
+
+            {isScannerOpen && (
+                <ScannerModal
+                    onClose={() => setIsScannerOpen(false)}
+                    onCardAdded={loadCollection}
+                />
+            )}
         </div>
     );
 }

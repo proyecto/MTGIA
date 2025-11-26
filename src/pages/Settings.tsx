@@ -134,7 +134,8 @@ export default function Settings() {
           <div className="pt-4 border-t border-gray-200">
             <h3 className="text-sm font-medium text-gray-900 mb-2">Import Collection</h3>
             <p className="text-xs text-gray-500 mb-3">
-              Import cards from a CSV file. This will add cards to your existing collection.
+              Import cards from a CSV file. Supports MTGIA, Moxfield, and Archidekt formats.
+              This will add cards to your existing collection.
             </p>
             <input
               ref={fileInputRef}

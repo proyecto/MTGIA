@@ -416,62 +416,96 @@ pub async fn import_collection(
     state: State<'_, AppState>,
     csv_content: String,
 ) -> Result<String, String> {
-    let db = state
-        .db
-        .lock()
-        .map_err(|_| "Failed to lock db".to_string())?;
+    // Parse CSV first without lock
+    let import_service = crate::services::import::ImportService::new();
+    let cards = import_service
+        .parse_csv(&csv_content)
+        .map_err(|e| e.to_string())?;
 
-    let lines: Vec<&str> = csv_content.lines().collect();
-    if lines.is_empty() {
-        return Err("CSV file is empty".to_string());
+    if cards.is_empty() {
+        return Err("No cards found in CSV".to_string());
     }
 
     let mut imported = 0;
     let mut skipped = 0;
 
-    // Skip header (first line)
-    for line in lines.iter().skip(1) {
-        if line.trim().is_empty() {
-            continue;
+    let scryfall_service = ScryfallService::new();
+
+    for card in cards {
+        let mut scryfall_id = card.scryfall_id.clone();
+        let mut scryfall_card_data = None;
+
+        // 1. Resolve Scryfall ID (Async, no lock needed)
+        if scryfall_id.is_none() {
+            if let Some(set) = &card.set_code {
+                if let Some(cn) = &card.collector_number {
+                    let query = format!("set:{} cn:{}", set, cn);
+                    if let Ok(results) = scryfall_service.search_cards(&query, 1).await {
+                        if let Some(first) = results.data.first() {
+                            scryfall_id = Some(first.id.clone());
+                            scryfall_card_data = Some(first.clone());
+                        }
+                    }
+                } else {
+                    let query = format!("!\"{}\" set:{}", card.name, set);
+                    if let Ok(results) = scryfall_service.search_cards(&query, 1).await {
+                        if let Some(first) = results.data.first() {
+                            scryfall_id = Some(first.id.clone());
+                            scryfall_card_data = Some(first.clone());
+                        }
+                    }
+                }
+            } else {
+                let query = format!("!\"{}\"", card.name);
+                if let Ok(results) = scryfall_service.search_cards(&query, 1).await {
+                    if let Some(first) = results.data.first() {
+                        scryfall_id = Some(first.id.clone());
+                        scryfall_card_data = Some(first.clone());
+                    }
+                }
+            }
         }
 
-        // Simple CSV parsing (handles quoted fields)
-        let parts: Vec<String> = parse_csv_line(line);
+        // 2. Fetch Card Data if needed (Async, no lock needed)
+        if let Some(sid) = scryfall_id {
+            let card_data = if let Some(data) = scryfall_card_data {
+                data
+            } else {
+                match scryfall_service.fetch_card(&sid).await {
+                    Ok(data) => data,
+                    Err(_) => {
+                        skipped += 1;
+                        continue;
+                    }
+                }
+            };
 
-        if parts.len() < 10 {
+            // 3. Insert into DB (Needs lock)
+            let id = uuid::Uuid::new_v4().to_string();
+            let args = AddCardArgs {
+                scryfall_id: sid,
+                condition: card.condition,
+                purchase_price: 0.0,
+                quantity: card.quantity,
+                is_foil: card.is_foil,
+                language: card.language,
+            };
+
+            {
+                let db = state
+                    .db
+                    .lock()
+                    .map_err(|_| "Failed to lock db".to_string())?;
+
+                match operations::insert_card(&db, &id, &card_data, &args, "USD") {
+                    Ok(_) => imported += 1,
+                    Err(_) => skipped += 1,
+                }
+            }
+
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        } else {
             skipped += 1;
-            continue;
-        }
-
-        let name = &parts[0];
-        let set_code = &parts[1];
-        let collector_number = &parts[2];
-        let condition = &parts[3];
-        let purchase_price: f64 = parts[4].parse().unwrap_or(0.0);
-        let current_price: f64 = parts[5].parse().unwrap_or(0.0);
-        let quantity: i32 = parts[6].parse().unwrap_or(1);
-        let is_foil = parts[7] == "1" || parts[7].to_lowercase() == "true";
-        let language = if parts.len() > 9 {
-            &parts[8]
-        } else {
-            "English"
-        };
-        let scryfall_id = if parts.len() > 9 {
-            &parts[9]
-        } else {
-            &parts[8]
-        };
-
-        // Generate a unique ID
-        let id = uuid::Uuid::new_v4().to_string();
-
-        match db.execute(
-            "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, language) 
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
-            rusqlite::params![id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, language],
-        ) {
-            Ok(_) => imported += 1,
-            Err(_) => skipped += 1,
         }
     }
 
@@ -479,40 +513,4 @@ pub async fn import_collection(
         "Imported {} cards, skipped {} cards",
         imported, skipped
     ))
-}
-
-/// Parses a single line of CSV content, handling quoted fields.
-///
-/// # Arguments
-///
-/// * `line` - The CSV line to parse.
-///
-/// # Returns
-///
-/// * `Vec<String>` - A vector of fields parsed from the line.
-fn parse_csv_line(line: &str) -> Vec<String> {
-    let mut parts = Vec::new();
-    let mut current = String::new();
-    let mut in_quotes = false;
-    let mut chars = line.chars().peekable();
-
-    while let Some(c) = chars.next() {
-        match c {
-            '"' => {
-                if in_quotes && chars.peek() == Some(&'"') {
-                    current.push('"');
-                    chars.next();
-                } else {
-                    in_quotes = !in_quotes;
-                }
-            }
-            ',' if !in_quotes => {
-                parts.push(current.clone());
-                current.clear();
-            }
-            _ => current.push(c),
-        }
-    }
-    parts.push(current);
-    parts
 }

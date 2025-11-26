@@ -10,6 +10,7 @@ export default function Sidebar({ activeTab = 'collection', onTabChange }: Sideb
         { id: 'collection', label: 'My Collection', icon: '📚' },
         { id: 'decks', label: 'Dashboard', icon: '📊' },
         { id: 'wishlist', label: 'Wishlist', icon: '⭐️' },
+        { id: 'market', label: 'Market', icon: '📈' },
         { id: 'settings', label: 'Settings', icon: '⚙️' },
     ];
 

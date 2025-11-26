@@ -63,6 +63,28 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
         [],
     )?;
 
+    // Tags table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS tags (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            color TEXT DEFAULT '#3B82F6'
+        )",
+        [],
+    )?;
+
+    // Card Tags junction table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS card_tags (
+            card_id TEXT NOT NULL,
+            tag_id INTEGER NOT NULL,
+            PRIMARY KEY (card_id, tag_id),
+            FOREIGN KEY(card_id) REFERENCES cards(id) ON DELETE CASCADE,
+            FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        )",
+        [],
+    )?;
+
     Ok(())
 }
 

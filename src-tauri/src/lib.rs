@@ -93,6 +93,13 @@ pub fn run() {
             commands::collection::export_collection,
             commands::collection::import_collection,
             commands::analytics::get_collection_stats,
+            commands::market::get_market_trends,
+            commands::tags::create_tag,
+            commands::tags::delete_tag,
+            commands::tags::get_all_tags,
+            commands::tags::add_tag_to_card,
+            commands::tags::remove_tag_from_card,
+            commands::tags::get_card_tags,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
