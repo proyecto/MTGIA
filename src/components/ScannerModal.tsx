@@ -18,6 +18,49 @@ export default function ScannerModal({ onClose, onCardAdded }: ScannerModalProps
     const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
     const [status, setStatus] = useState('Ready to scan');
 
+    const preprocessImage = (imageSrc: string): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    resolve(imageSrc);
+                    return;
+                }
+
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+
+                // Convert to grayscale and increase contrast
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+
+                    // Grayscale (luminosity method)
+                    let gray = 0.21 * r + 0.72 * g + 0.07 * b;
+
+                    // Increase contrast
+                    // Simple binarization threshold
+                    gray = gray > 128 ? 255 : 0;
+
+                    data[i] = gray;
+                    data[i + 1] = gray;
+                    data[i + 2] = gray;
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                resolve(canvas.toDataURL('image/jpeg'));
+            };
+            img.src = imageSrc;
+        });
+    };
+
     const capture = useCallback(async () => {
         const imageSrc = webcamRef.current?.getScreenshot();
         if (!imageSrc) return;
@@ -28,33 +71,39 @@ export default function ScannerModal({ onClose, onCardAdded }: ScannerModalProps
         setOcrText('');
 
         try {
+            // Preprocess image
+            const processedImage = await preprocessImage(imageSrc);
+
             setStatus('Recognizing text...');
             const { data: { text } } = await Tesseract.recognize(
-                imageSrc,
+                processedImage,
                 'eng',
                 { logger: m => console.log(m) }
             );
 
             setOcrText(text);
-            setStatus('Searching Scryfall...');
+            setStatus('Analyzing text...');
 
-            // Clean text: keep only letters and spaces, remove short words
-            const cleanText = text
-                .replace(/[^a-zA-Z\s]/g, ' ')
-                .split(/\s+/)
-                .filter(word => word.length > 2)
-                .join(' ')
-                .trim();
+            // Clean text: split by lines, filter short lines, take the best candidate
+            const lines = text.split('\n')
+                .map(line => line.replace(/[^a-zA-Z\s]/g, '').trim())
+                .filter(line => line.length > 3);
 
-            if (!cleanText) {
+            if (lines.length === 0) {
                 setStatus('No readable text found.');
                 setScanning(false);
                 return;
             }
 
-            console.log('Searching for:', cleanText);
+            // Heuristic: The card name is often the first significant line
+            // We can try the first few lines as potential queries
+            const candidate = lines[0];
+
+            console.log('Searching for:', candidate);
+            setStatus(`Searching for "${candidate}"...`);
+
             const results = await invoke<ScryfallCardList>('search_scryfall', {
-                query: cleanText,
+                query: candidate,
                 page: 1
             });
 
@@ -62,7 +111,26 @@ export default function ScannerModal({ onClose, onCardAdded }: ScannerModalProps
                 setSearchResults(results.data.slice(0, 5)); // Top 5
                 setStatus(`Found ${results.data.length} matches.`);
             } else {
-                setStatus('No matches found.');
+                // If first line failed, try the second if available
+                if (lines.length > 1) {
+                    const secondCandidate = lines[1];
+                    console.log('Retrying with:', secondCandidate);
+                    setStatus(`Retrying with "${secondCandidate}"...`);
+
+                    const retryResults = await invoke<ScryfallCardList>('search_scryfall', {
+                        query: secondCandidate,
+                        page: 1
+                    });
+
+                    if (retryResults.data && retryResults.data.length > 0) {
+                        setSearchResults(retryResults.data.slice(0, 5));
+                        setStatus(`Found ${retryResults.data.length} matches.`);
+                    } else {
+                        setStatus('No matches found.');
+                    }
+                } else {
+                    setStatus('No matches found.');
+                }
             }
 
         } catch (error) {

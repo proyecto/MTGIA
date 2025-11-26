@@ -27,6 +27,7 @@ export default function CardItem({
     quantity,
     is_foil,
     language,
+    tags,
     onClick,
     onEdit,
     onDelete
@@ -85,6 +86,20 @@ export default function CardItem({
                         x{quantity}
                     </div>
                 </div>
+
+                {tags && tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                        {tags.map(tag => (
+                            <span
+                                key={tag.id}
+                                className="text-[10px] px-1.5 py-0.5 rounded-full text-white font-medium"
+                                style={{ backgroundColor: tag.color }}
+                            >
+                                {tag.name}
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 {/* Action buttons - shown on hover */}
                 {(onEdit || onDelete) && (

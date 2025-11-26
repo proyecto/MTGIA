@@ -142,12 +142,16 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
             finish: row
                 .get::<_, Option<String>>(12)?
                 .unwrap_or_else(|| "nonfoil".to_string()),
+            tags: None, // Will be populated below
         })
     })?;
 
     let mut cards = Vec::new();
     for card in card_iter {
-        cards.push(card?);
+        let mut card = card?;
+        // Fetch tags for each card
+        card.tags = Some(get_card_tags(conn, &card.id)?);
+        cards.push(card);
     }
 
     Ok(cards)
@@ -533,12 +537,7 @@ pub fn get_collection_stats(
 
 // ============ Tag Operations ============
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct Tag {
-    pub id: i32,
-    pub name: String,
-    pub color: String,
-}
+// Tag struct moved to models::tags::Tag
 
 pub fn create_tag(conn: &Connection, name: &str, color: &str) -> Result<i32> {
     conn.execute(
@@ -554,10 +553,10 @@ pub fn delete_tag(conn: &Connection, id: i32) -> Result<()> {
     Ok(())
 }
 
-pub fn get_all_tags(conn: &Connection) -> Result<Vec<Tag>> {
+pub fn get_all_tags(conn: &Connection) -> Result<Vec<crate::models::tags::Tag>> {
     let mut stmt = conn.prepare("SELECT id, name, color FROM tags ORDER BY name ASC")?;
     let tag_iter = stmt.query_map([], |row| {
-        Ok(Tag {
+        Ok(crate::models::tags::Tag {
             id: row.get(0)?,
             name: row.get(1)?,
             color: row.get(2)?,
@@ -587,7 +586,7 @@ pub fn remove_tag_from_card(conn: &Connection, card_id: &str, tag_id: i32) -> Re
     Ok(())
 }
 
-pub fn get_card_tags(conn: &Connection, card_id: &str) -> Result<Vec<Tag>> {
+pub fn get_card_tags(conn: &Connection, card_id: &str) -> Result<Vec<crate::models::tags::Tag>> {
     let mut stmt = conn.prepare(
         "SELECT t.id, t.name, t.color 
          FROM tags t
@@ -597,7 +596,7 @@ pub fn get_card_tags(conn: &Connection, card_id: &str) -> Result<Vec<Tag>> {
     )?;
 
     let tag_iter = stmt.query_map([card_id], |row| {
-        Ok(Tag {
+        Ok(crate::models::tags::Tag {
             id: row.get(0)?,
             name: row.get(1)?,
             color: row.get(2)?,

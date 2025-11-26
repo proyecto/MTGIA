@@ -7,7 +7,7 @@ import EditCardModal from '../components/EditCardModal';
 import CardDetailsModal from '../components/CardDetailsModal';
 import ScannerModal from '../components/ScannerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { CollectionCard, ScryfallCard } from '../types';
+import { CollectionCard, ScryfallCard, Tag } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
 /**
@@ -22,6 +22,8 @@ export default function Collection() {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<'name' | 'price-desc' | 'price-asc' | 'quantity'>('name');
     const [selectedSet, setSelectedSet] = useState<string>('all');
+    const [selectedTag, setSelectedTag] = useState<string>('all');
+    const [allTags, setAllTags] = useState<Tag[]>([]);
     const [isStatsOpen, setIsStatsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [cardToEdit, setCardToEdit] = useState<CollectionCard | null>(null);
@@ -36,6 +38,7 @@ export default function Collection() {
 
     useEffect(() => {
         loadCollection();
+        loadTags();
     }, []);
 
     async function loadCollection() {
@@ -46,6 +49,15 @@ export default function Collection() {
             console.error('Failed to load collection:', error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function loadTags() {
+        try {
+            const tags = await invoke<Tag[]>('get_all_tags');
+            setAllTags(tags);
+        } catch (error) {
+            console.error('Failed to load tags:', error);
         }
     }
 
@@ -104,6 +116,14 @@ export default function Collection() {
     const filteredCards = cards.filter(card => {
         const matchesSearch = card.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesSet = selectedSet === 'all' || card.set_code === selectedSet;
+
+        if (selectedTag !== 'all') {
+            const tagId = parseInt(selectedTag);
+            if (!card.tags || !card.tags.some(t => t.id === tagId)) {
+                return false;
+            }
+        }
+
         return matchesSearch && matchesSet;
     });
 
@@ -179,6 +199,17 @@ export default function Collection() {
                     <option value="all">All Sets</option>
                     {uniqueSets.map(set => (
                         <option key={set} value={set}>{set.toUpperCase()}</option>
+                    ))}
+                </select>
+
+                <select
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                    className="w-full md:w-48 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent-blue outline-none"
+                >
+                    <option value="all">All Tags</option>
+                    {allTags.map(tag => (
+                        <option key={tag.id} value={tag.id.toString()}>{tag.name}</option>
                     ))}
                 </select>
 

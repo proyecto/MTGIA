@@ -1,4 +1,5 @@
-use crate::database::operations::{self, Tag};
+use crate::database::operations;
+use crate::models::tags::Tag;
 use crate::AppState;
 use tauri::State;
 

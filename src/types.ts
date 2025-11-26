@@ -84,6 +84,8 @@ export interface CollectionCard {
     language: string;
     /** Finish of the card (nonfoil, foil, etched, etc.) */
     finish: string;
+    /** Tags assigned to the card */
+    tags?: Tag[];
 }
 
 /**

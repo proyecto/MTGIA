@@ -29,4 +29,6 @@ pub struct CollectionCard {
     pub language: String,
     /// Finish of the card (nonfoil, foil, etched, etc.)
     pub finish: String,
+    /// Tags assigned to the card
+    pub tags: Option<Vec<crate::models::tags::Tag>>,
 }
