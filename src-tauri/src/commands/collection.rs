@@ -13,6 +13,8 @@ pub struct AddCardArgs {
     pub quantity: i32,
     pub is_foil: bool,
     pub language: String,
+    pub finish: Option<String>,
+    pub tags: Option<Vec<String>>, // List of "Name:Color" strings
 }
 
 /// Adds a new card to the user's collection.
@@ -379,12 +381,23 @@ pub async fn export_collection(state: State<'_, AppState>) -> Result<String, Str
     let cards = operations::get_all_cards(&db).map_err(|e| e.to_string())?;
 
     // Create CSV header
-    let mut csv = String::from("name,set_code,collector_number,condition,purchase_price,current_price,quantity,is_foil,language,scryfall_id\n");
+    let mut csv = String::from("name,set_code,collector_number,condition,purchase_price,current_price,quantity,is_foil,language,finish,tags,scryfall_id\n");
 
     // Add each card as a row
     for card in cards {
+        let tags_str = card
+            .tags
+            .as_ref()
+            .map(|t| {
+                t.iter()
+                    .map(|tag| format!("{}:{}", tag.name, tag.color))
+                    .collect::<Vec<_>>()
+                    .join(";")
+            })
+            .unwrap_or_default();
+
         csv.push_str(&format!(
-            "\"{}\",{},{},{},{},{},{},{},\"{}\",{}\n",
+            "\"{}\",{},{},{},{},{},{},{},\"{}\",\"{}\",\"{}\",{}\n",
             card.name.replace("\"", "\"\""), // Escape quotes
             card.set_code,
             card.collector_number,
@@ -394,6 +407,8 @@ pub async fn export_collection(state: State<'_, AppState>) -> Result<String, Str
             card.quantity,
             if card.is_foil { 1 } else { 0 },
             card.language.replace("\"", "\"\""), // Escape quotes in language
+            card.finish.replace("\"", "\"\""),
+            tags_str.replace("\"", "\"\""),
             card.scryfall_id
         ));
     }
@@ -489,6 +504,8 @@ pub async fn import_collection(
                 quantity: card.quantity,
                 is_foil: card.is_foil,
                 language: card.language,
+                finish: Some(card.finish),
+                tags: card.tags.map(|t| vec![t]),
             };
 
             {

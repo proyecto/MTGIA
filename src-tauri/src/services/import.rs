@@ -10,6 +10,8 @@ pub struct ImportCard {
     pub condition: String,
     pub language: String,
     pub is_foil: bool,
+    pub finish: String,
+    pub tags: Option<String>,
     pub scryfall_id: Option<String>,
 }
 
@@ -74,6 +76,13 @@ impl ImportService {
                 .unwrap_or(false);
             let collector_number = record.get("Collector Number").cloned();
 
+            // Map finish based on foil status for Moxfield
+            let finish = if is_foil {
+                "foil".to_string()
+            } else {
+                "nonfoil".to_string()
+            };
+
             cards.push(ImportCard {
                 name,
                 set_code,
@@ -82,6 +91,8 @@ impl ImportService {
                 condition,
                 language,
                 is_foil,
+                finish,
+                tags: None,
                 scryfall_id: None, // Moxfield CSV might not have ID, or we need to fetch it
             });
         }
@@ -110,6 +121,11 @@ impl ImportService {
             // Archidekt might not have condition/language in simple export
             let condition = "NM".to_string();
             let language = "English".to_string();
+            let finish = if is_foil {
+                "foil".to_string()
+            } else {
+                "nonfoil".to_string()
+            };
 
             cards.push(ImportCard {
                 name,
@@ -119,6 +135,8 @@ impl ImportService {
                 condition,
                 language,
                 is_foil,
+                finish,
+                tags: None,
                 scryfall_id: None,
             });
         }
@@ -150,6 +168,14 @@ impl ImportService {
                 .get("language")
                 .cloned()
                 .unwrap_or("English".to_string());
+            let finish = record.get("finish").cloned().unwrap_or_else(|| {
+                if is_foil {
+                    "foil".to_string()
+                } else {
+                    "nonfoil".to_string()
+                }
+            });
+            let tags = record.get("tags").cloned();
             let scryfall_id = record.get("scryfall_id").cloned();
 
             cards.push(ImportCard {
@@ -160,6 +186,8 @@ impl ImportService {
                 condition,
                 language,
                 is_foil,
+                finish,
+                tags,
                 scryfall_id,
             });
         }

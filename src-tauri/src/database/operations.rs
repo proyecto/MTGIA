@@ -1,6 +1,6 @@
 use crate::commands::collection::AddCardArgs;
 use crate::models::scryfall::{ScryfallCard, ScryfallSet};
-use rusqlite::{params, Connection, Result};
+use rusqlite::{params, Connection, OptionalExtension, Result};
 
 /// Inserts or updates a set in the database.
 ///
@@ -88,6 +88,14 @@ pub fn insert_card(
         .map(|u| u.normal.clone())
         .unwrap_or_default();
 
+    let finish = args.finish.clone().unwrap_or_else(|| {
+        if args.is_foil {
+            "foil".to_string()
+        } else {
+            "nonfoil".to_string()
+        }
+    });
+
     conn.execute(
         "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
@@ -104,9 +112,45 @@ pub fn insert_card(
             args.is_foil,
             image_uri,
             args.language,
-            if args.is_foil { "foil" } else { "nonfoil" } // Default finish based on is_foil
+            finish
         ],
     )?;
+
+    // Handle Tags
+    if let Some(tags) = &args.tags {
+        for tag_str in tags {
+            let parts: Vec<&str> = tag_str.split(':').collect();
+            let name = parts.get(0).unwrap_or(&"Unknown").trim();
+            let color = parts.get(1).unwrap_or(&"#6B7280").trim(); // Default gray
+
+            // Check if tag exists
+            let tag_id: Option<i32> = conn
+                .query_row(
+                    "SELECT id FROM tags WHERE name = ?1",
+                    params![name],
+                    |row| row.get(0),
+                )
+                .optional()?;
+
+            let final_tag_id = if let Some(tid) = tag_id {
+                tid
+            } else {
+                // Create new tag
+                conn.execute(
+                    "INSERT INTO tags (name, color) VALUES (?1, ?2)",
+                    params![name, color],
+                )?;
+                conn.last_insert_rowid() as i32
+            };
+
+            // Link tag to card
+            conn.execute(
+                "INSERT OR IGNORE INTO card_tags (card_id, tag_id) VALUES (?1, ?2)",
+                params![id, final_tag_id],
+            )?;
+        }
+    }
+
     Ok(())
 }
 
@@ -755,6 +799,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         let result = insert_card(&conn, "test-uuid-1", &card, &args, "USD");
@@ -778,6 +824,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -801,6 +849,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -824,6 +874,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         // Insert card
@@ -882,6 +934,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         // Insert card
@@ -936,6 +990,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -961,6 +1017,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         // Insert card
@@ -1007,6 +1065,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
 
         // Insert card but no price history
@@ -1033,6 +1093,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
         insert_card(&conn, "uuid-1", &card1, &args1, "USD").unwrap();
         update_card_price(&conn, "uuid-1", 20.0).unwrap();
@@ -1048,6 +1110,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
         insert_card(&conn, "uuid-2", &card2, &args2, "USD").unwrap();
         update_card_price(&conn, "uuid-2", 10.0).unwrap();
@@ -1091,6 +1155,8 @@ mod tests {
             quantity: 1,
             is_foil: false,
             language: "English".to_string(),
+            finish: None,
+            tags: None,
         };
         insert_card(&conn, "card-uuid-1", &card, &args, "USD").unwrap();
 
