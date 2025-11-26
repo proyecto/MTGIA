@@ -21,6 +21,7 @@ pub struct ScryfallSetList {
 pub struct ScryfallCardList {
     pub data: Vec<ScryfallCard>,
     pub has_more: bool,
+    pub total_cards: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

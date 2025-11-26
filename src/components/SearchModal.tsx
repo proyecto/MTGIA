@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ScryfallCard, AddCardArgs } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
@@ -13,7 +13,13 @@ interface SearchModalProps {
     /** Callback to close the modal */
     onClose: () => void;
     /** Callback triggered when a card is successfully added */
-    onCardAdded: () => void;
+    onCardAdded: (id: string) => void;
+}
+
+interface ScryfallCardList {
+    data: ScryfallCard[];
+    has_more: boolean;
+    total_cards?: number;
 }
 
 /**
@@ -26,6 +32,9 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
     const [results, setResults] = useState<ScryfallCard[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [totalCards, setTotalCards] = useState<number | undefined>(undefined);
 
     // Form state
     const [quantity, setQuantity] = useState(1);
@@ -47,25 +56,58 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
         }
     }, [selectedCard, finish, currency]);
 
+    const search = useCallback(async (searchQuery: string, pageNum: number = 1) => {
+        console.log(`Frontend searching: "${searchQuery}" Page: ${pageNum}`);
+        if (!searchQuery.trim()) {
+            setResults([]);
+            setHasMore(false);
+            setPage(1);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await invoke<ScryfallCardList>('search_scryfall', {
+                query: searchQuery,
+                page: pageNum
+            });
+
+            if (pageNum === 1) {
+                setResults(response.data);
+            } else {
+                setResults(prev => [...prev, ...response.data]);
+            }
+
+            setHasMore(response.has_more);
+            setTotalCards(response.total_cards);
+            setPage(pageNum);
+            console.log('Search response:', response);
+        } catch (error) {
+            console.error('Search failed:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []); // No dependencies, as query is passed as an argument
+
     useEffect(() => {
-        const delayDebounceFn = setTimeout(async () => {
+        const delayDebounceFn = setTimeout(() => {
             if (query.length > 2) {
-                setLoading(true);
-                try {
-                    const cards = await invoke<ScryfallCard[]>('search_scryfall', { query });
-                    setResults(cards);
-                } catch (error) {
-                    console.error("Search failed:", error);
-                } finally {
-                    setLoading(false);
-                }
+                search(query, 1); // Always start a new search from page 1 when query changes
             } else {
                 setResults([]);
+                setHasMore(false);
+                setPage(1);
             }
         }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [query]);
+    }, [query, search]);
+
+    const handleLoadMore = () => {
+        if (!loading && hasMore) {
+            search(query, page + 1);
+        }
+    };
 
     async function handleAddCard() {
         if (!selectedCard) return;
@@ -84,7 +126,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             // We should probably pass the currency preference to the backend too, or just let the backend store the purchase price as is.
             // For now, let's update the backend to respect the currency for current_price.
             await invoke('add_card', { args, currencyPreference: currency });
-            onCardAdded();
+            onCardAdded(selectedCard.id); // Pass the card ID
             handleClose();
         } catch (error) {
             console.error("Failed to add card:", error);
@@ -100,6 +142,8 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
         setCondition('NM');
         setLanguage('English');
         setFinish('nonfoil');
+        setPage(1);
+        setHasMore(false);
         onClose();
     }
 
@@ -133,129 +177,153 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                            {loading && <div className="text-center text-gray-500 py-4">Searching...</div>}
-                            {results.map((card) => (
-                                <div
-                                    key={card.id}
-                                    onClick={() => setSelectedCard(card)}
-                                    className={`flex items-center p-2 rounded-lg cursor-pointer transition-colors ${selectedCard?.id === card.id ? 'bg-blue-50 border-blue-200 border' : 'hover:bg-gray-50 border border-transparent'
-                                        }`}
-                                >
-                                    {card.image_uris?.small && (
-                                        <img src={card.image_uris.small} alt={card.name} className="w-12 h-16 object-cover rounded shadow-sm mr-3" />
-                                    )}
-                                    <div>
-                                        <div>
-                                            <div className="font-medium text-gray-900">{card.name}</div>
-                                            <div className="text-xs text-gray-500 flex flex-col gap-0.5">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="uppercase font-mono bg-gray-100 px-1 rounded" title={card.set_name}>{card.set}</span>
-                                                    <span className="truncate max-w-[150px]">{card.set_name}</span>
-                                                    <span>({card.released_at?.substring(0, 4)})</span>
+                            <div className="text-xs text-gray-400 mb-2">
+                                Found {totalCards ?? results.length} cards. Page {page}. Has more: {hasMore ? 'Yes' : 'No'}
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
+                                {loading && page === 1 && <div className="text-center text-gray-500 py-4">Searching...</div>}
+                                {results.map((card) => (
+                                    <div
+                                        key={card.id}
+                                        className={`p-3 rounded-lg border cursor-pointer transition-colors flex gap-3 ${selectedCard?.id === card.id
+                                            ? 'border-indigo-500 bg-indigo-50'
+                                            : 'border-gray-200 hover:border-indigo-300'
+                                            }`}
+                                        onClick={() => setSelectedCard(card)}
+                                    >
+                                        {/* Card Image Thumbnail */}
+                                        <div className="w-12 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                                            {card.image_uris?.small ? (
+                                                <img
+                                                    src={card.image_uris.small}
+                                                    alt={card.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                                    No Img
                                                 </div>
-                                                <div className="text-gray-400">
-                                                    #{card.collector_number} • {card.artist}
-                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-medium text-gray-900 truncate">{card.name}</div>
+                                            <div className="text-sm text-gray-500 flex items-center gap-2">
+                                                <span className="uppercase font-mono bg-gray-100 px-1 rounded text-xs">
+                                                    {card.set}
+                                                </span>
+                                                <span className="truncate">{card.set_name}</span>
+                                                <span className="text-gray-400">#{card.collector_number}</span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                                ))}
 
-                    {/* Right: Details Form */}
-                    {selectedCard && (
-                        <div className="w-full md:w-80 bg-gray-50 p-6 flex flex-col overflow-y-auto">
-                            <div className="mb-6 flex justify-center">
-                                {selectedCard.image_uris?.normal ? (
-                                    <img src={selectedCard.image_uris.normal} alt={selectedCard.name} className="rounded-lg shadow-md max-w-[200px]" />
-                                ) : (
-                                    <div className="w-[200px] h-[280px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">No Image</div>
+                                {hasMore && (
+                                    <button
+                                        onClick={handleLoadMore}
+                                        disabled={loading}
+                                        className="w-full py-2 mt-2 text-sm text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50"
+                                    >
+                                        {loading ? 'Loading...' : 'Load More Results'}
+                                    </button>
                                 )}
                             </div>
+                        </div>
 
-                            <h3 className="font-bold text-lg text-gray-900 mb-1">{selectedCard.name}</h3>
-                            <p className="text-sm text-gray-500 mb-6">{selectedCard.set.toUpperCase()} • {selectedCard.rarity}</p>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">Condition</label>
-                                    <select
-                                        value={condition}
-                                        onChange={(e) => setCondition(e.target.value)}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
-                                    >
-                                        <option value="NM">Near Mint (NM)</option>
-                                        <option value="LP">Lightly Played (LP)</option>
-                                        <option value="MP">Moderately Played (MP)</option>
-                                        <option value="HP">Heavily Played (HP)</option>
-                                        <option value="DMG">Damaged (DMG)</option>
-                                    </select>
+                        {/* Right: Details Form */}
+                        {selectedCard && (
+                            <div className="w-full md:w-80 bg-gray-50 p-6 flex flex-col overflow-y-auto">
+                                <div className="mb-6 flex justify-center">
+                                    {selectedCard.image_uris?.normal ? (
+                                        <img src={selectedCard.image_uris.normal} alt={selectedCard.name} className="rounded-lg shadow-md max-w-[200px]" />
+                                    ) : (
+                                        <div className="w-[200px] h-[280px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">No Image</div>
+                                    )}
                                 </div>
 
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">Language</label>
-                                    <select
-                                        value={language}
-                                        onChange={(e) => setLanguage(e.target.value)}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
-                                    >
-                                        <option value="English">English</option>
-                                        <option value="Spanish">Spanish</option>
-                                        <option value="Japanese">Japanese</option>
-                                        <option value="German">German</option>
-                                        <option value="French">French</option>
-                                        <option value="Italian">Italian</option>
-                                        <option value="Portuguese">Portuguese</option>
-                                        <option value="Russian">Russian</option>
-                                        <option value="Korean">Korean</option>
-                                        <option value="Chinese Simplified">Chinese Simplified</option>
-                                        <option value="Chinese Traditional">Chinese Traditional</option>
-                                    </select>
-                                </div>
+                                <h3 className="font-bold text-lg text-gray-900 mb-1">{selectedCard.name}</h3>
+                                <p className="text-sm text-gray-500 mb-6">{selectedCard.set.toUpperCase()} • {selectedCard.rarity}</p>
 
-                                <div className="flex gap-4">
-                                    <div className="flex-1">
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={quantity}
-                                            onChange={(e) => setQuantity(parseInt(e.target.value))}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">Condition</label>
+                                        <select
+                                            value={condition}
+                                            onChange={(e) => setCondition(e.target.value)}
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
-                                        />
+                                        >
+                                            <option value="NM">Near Mint (NM)</option>
+                                            <option value="LP">Lightly Played (LP)</option>
+                                            <option value="MP">Moderately Played (MP)</option>
+                                            <option value="HP">Heavily Played (HP)</option>
+                                            <option value="DMG">Damaged (DMG)</option>
+                                        </select>
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Finish</label>
-                                        <FinishSelector
-                                            value={finish}
-                                            onChange={setFinish}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Price ({currency === 'EUR' ? '€' : '$'})</label>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            value={price}
-                                            onChange={(e) => setPrice(parseFloat(e.target.value))}
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">Language</label>
+                                        <select
+                                            value={language}
+                                            onChange={(e) => setLanguage(e.target.value)}
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
-                                        />
+                                        >
+                                            <option value="English">English</option>
+                                            <option value="Spanish">Spanish</option>
+                                            <option value="Japanese">Japanese</option>
+                                            <option value="German">German</option>
+                                            <option value="French">French</option>
+                                            <option value="Italian">Italian</option>
+                                            <option value="Portuguese">Portuguese</option>
+                                            <option value="Russian">Russian</option>
+                                            <option value="Korean">Korean</option>
+                                            <option value="Chinese Simplified">Chinese Simplified</option>
+                                            <option value="Chinese Traditional">Chinese Traditional</option>
+                                        </select>
                                     </div>
 
-                                    <button
-                                        onClick={handleAddCard}
-                                        className="w-full btn-primary mt-4 flex justify-center items-center gap-2"
-                                    >
-                                        <span>Add to Collection</span>
-                                    </button>
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={quantity}
+                                                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Finish</label>
+                                            <FinishSelector
+                                                value={finish}
+                                                onChange={setFinish}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Price ({currency === 'EUR' ? '€' : '$'})</label>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={price}
+                                                onChange={(e) => setPrice(parseFloat(e.target.value))}
+                                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                            />
+                                        </div>
+
+                                        <button
+                                            onClick={handleAddCard}
+                                            className="w-full btn-primary mt-4 flex justify-center items-center gap-2"
+                                        >
+                                            <span>Add to Collection</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -62,10 +62,13 @@ pub async fn add_card(
 ///
 /// * `Result<Vec<ScryfallCard>, String>` - A list of matching cards or an error message.
 #[tauri::command]
-pub async fn search_scryfall(query: String) -> Result<Vec<ScryfallCard>, String> {
+pub async fn search_scryfall(
+    query: String,
+    page: u32,
+) -> Result<crate::models::scryfall::ScryfallCardList, String> {
     let service = ScryfallService::new();
     service
-        .search_cards(&query)
+        .search_cards(&query, page)
         .await
         .map_err(|e| e.to_string())
 }

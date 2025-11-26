@@ -9,22 +9,47 @@ interface SetCardsProps {
     onBack: () => void;
 }
 
+interface ScryfallCardList {
+    data: ScryfallCard[];
+    has_more: boolean;
+    total_cards?: number;
+}
+
 export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
     const [cards, setCards] = useState<ScryfallCard[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [totalCards, setTotalCards] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        loadCards();
+        setCards([]);
+        setPage(1);
+        setHasMore(false);
+        setTotalCards(undefined);
+        loadCards(1);
     }, [setCode]);
 
-    async function loadCards() {
+    async function loadCards(pageNum: number) {
         setLoading(true);
         setError(null);
         try {
-            const result = await invoke<ScryfallCard[]>('get_set_cards', { setCode });
-            setCards(result);
+            const result = await invoke<ScryfallCardList>('get_set_cards', {
+                setCode,
+                page: pageNum
+            });
+
+            if (pageNum === 1) {
+                setCards(result.data);
+            } else {
+                setCards(prev => [...prev, ...result.data]);
+            }
+
+            setHasMore(result.has_more);
+            setTotalCards(result.total_cards);
+            setPage(pageNum);
         } catch (err) {
             console.error('Failed to load cards:', err);
             setError(typeof err === 'string' ? err : JSON.stringify(err));
@@ -32,6 +57,12 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
             setLoading(false);
         }
     }
+
+    const handleLoadMore = () => {
+        if (!loading && hasMore) {
+            loadCards(page + 1);
+        }
+    };
 
     if (loading) {
         return (
@@ -77,7 +108,8 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
                 <div className="flex-1 flex items-center justify-center">
                     <div className="text-center">
                         <p className="text-red-500 mb-4">Error: {error}</p>
-                        <button onClick={loadCards} className="btn-primary">
+                        <p className="text-red-500 mb-4">Error: {error}</p>
+                        <button onClick={() => loadCards(page)} className="btn-primary">
                             Retry
                         </button>
                     </div>
@@ -102,7 +134,15 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
                 <h1 className="text-2xl font-bold text-text-primary">{setName}</h1>
                 <p className="text-sm text-text-secondary mt-1">
                     <span className="uppercase font-mono bg-gray-100 px-2 py-0.5 rounded">{setCode}</span>
-                    <span className="ml-3">{cards.length} {cards.length === 1 ? 'card' : 'cards'}</span>
+                    <span className="ml-3">
+                        {totalCards !== undefined ? (
+                            <>
+                                {cards.length} of {totalCards} cards
+                            </>
+                        ) : (
+                            <>{cards.length} cards</>
+                        )}
+                    </span>
                 </p>
             </div>
 
@@ -155,16 +195,38 @@ export default function SetCards({ setCode, setName, onBack }: SetCardsProps) {
                             </div>
                         ))}
                     </div>
+
+                )}
+
+                {hasMore && (
+                    <div className="py-8 text-center">
+                        <button
+                            onClick={handleLoadMore}
+                            disabled={loading}
+                            className="px-6 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading ? (
+                                <span className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                                    Loading more...
+                                </span>
+                            ) : (
+                                'Load More Cards'
+                            )}
+                        </button>
+                    </div>
                 )}
             </div>
 
             {/* Card Details Modal */}
-            {selectedCard && (
-                <CardDetailsModal
-                    card={selectedCard}
-                    onClose={() => setSelectedCard(null)}
-                />
-            )}
-        </div>
+            {
+                selectedCard && (
+                    <CardDetailsModal
+                        card={selectedCard}
+                        onClose={() => setSelectedCard(null)}
+                    />
+                )
+            }
+        </div >
     );
 }
