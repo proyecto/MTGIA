@@ -4,6 +4,19 @@ use crate::models::wishlist::WishlistCard;
 use crate::AppState;
 use tauri::State;
 
+/// Adds a card to the wishlist.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `card` - The Scryfall card data.
+/// * `target_price` - Optional target price.
+/// * `notes` - Optional notes.
+/// * `priority` - Priority level (1-3).
+///
+/// # Returns
+///
+/// * `Result<String, String>` - The UUID of the newly created wishlist item or an error message.
 #[tauri::command]
 pub fn add_to_wishlist(
     state: State<'_, AppState>,
@@ -20,6 +33,15 @@ pub fn add_to_wishlist(
         .map_err(|e| e.to_string())
 }
 
+/// Retrieves all items from the wishlist.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<Vec<WishlistCard>, String>` - A list of wishlist items or an error message.
 #[tauri::command]
 pub fn get_wishlist(state: State<'_, AppState>) -> Result<Vec<WishlistCard>, String> {
     let db = state
@@ -29,6 +51,16 @@ pub fn get_wishlist(state: State<'_, AppState>) -> Result<Vec<WishlistCard>, Str
     operations::get_wishlist(&db).map_err(|e| e.to_string())
 }
 
+/// Removes an item from the wishlist.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `id` - The UUID of the wishlist item.
+///
+/// # Returns
+///
+/// * `Result<(), String>` - Ok if successful, or an error message.
 #[tauri::command]
 pub fn remove_from_wishlist(state: State<'_, AppState>, id: String) -> Result<(), String> {
     let db = state
@@ -38,6 +70,19 @@ pub fn remove_from_wishlist(state: State<'_, AppState>, id: String) -> Result<()
     operations::remove_from_wishlist(&db, &id).map_err(|e| e.to_string())
 }
 
+/// Updates a wishlist item.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `id` - The UUID of the wishlist item.
+/// * `target_price` - New target price.
+/// * `notes` - New notes.
+/// * `priority` - New priority.
+///
+/// # Returns
+///
+/// * `Result<(), String>` - Ok if successful, or an error message.
 #[tauri::command]
 pub fn update_wishlist_card(
     state: State<'_, AppState>,

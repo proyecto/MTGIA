@@ -2,6 +2,16 @@ use crate::commands::collection::AddCardArgs;
 use crate::models::scryfall::{ScryfallCard, ScryfallSet};
 use rusqlite::{params, Connection, Result};
 
+/// Inserts or updates a set in the database.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `set` - A reference to the ScryfallSet to insert.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn insert_set(conn: &Connection, set: &ScryfallSet) -> Result<()> {
     conn.execute(
         "INSERT OR REPLACE INTO sets (code, name, release_date, icon_uri)
@@ -16,6 +26,15 @@ pub fn insert_set(conn: &Connection, set: &ScryfallSet) -> Result<()> {
     Ok(())
 }
 
+/// Retrieves all sets from the database, ordered by release date descending.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+///
+/// # Returns
+///
+/// * `Result<Vec<ScryfallSet>>` - A vector of ScryfallSet objects.
 pub fn get_all_sets(conn: &Connection) -> Result<Vec<ScryfallSet>> {
     let mut stmt = conn.prepare(
         "SELECT code, name, release_date, icon_uri
@@ -43,6 +62,19 @@ pub fn get_all_sets(conn: &Connection) -> Result<Vec<ScryfallSet>> {
     Ok(sets)
 }
 
+/// Inserts a new card into the collection.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The unique UUID for the new card entry.
+/// * `card` - The Scryfall card data.
+/// * `args` - User-provided arguments (condition, quantity, etc.).
+/// * `_currency` - The currency code (unused in this function but kept for signature compatibility).
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn insert_card(
     conn: &Connection,
     id: &str,
@@ -57,8 +89,8 @@ pub fn insert_card(
         .unwrap_or_default();
 
     conn.execute(
-        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
+        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
         params![
             id,
             args.scryfall_id,
@@ -71,15 +103,25 @@ pub fn insert_card(
             args.quantity,
             args.is_foil,
             image_uri,
-            args.language
+            args.language,
+            if args.is_foil { "foil" } else { "nonfoil" } // Default finish based on is_foil
         ],
     )?;
     Ok(())
 }
 
+/// Retrieves all cards in the collection.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+///
+/// # Returns
+///
+/// * `Result<Vec<CollectionCard>>` - A vector of CollectionCard objects representing the user's collection.
 pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection::CollectionCard>> {
     let mut stmt = conn.prepare(
-        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language
+        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish
          FROM cards",
     )?;
 
@@ -97,6 +139,9 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
             is_foil: row.get(9)?,
             image_uri: row.get(10)?,
             language: row.get(11)?,
+            finish: row
+                .get::<_, Option<String>>(12)?
+                .unwrap_or_else(|| "nonfoil".to_string()),
         })
     })?;
 
@@ -108,6 +153,17 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
     Ok(cards)
 }
 
+/// Removes a card from the collection by its ID.
+/// Also removes associated price history.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The UUID of the card to remove.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn remove_card(conn: &Connection, id: &str) -> Result<()> {
     // First, delete all price history entries for this card
     conn.execute("DELETE FROM price_history WHERE card_id = ?1", params![id])?;
@@ -116,6 +172,17 @@ pub fn remove_card(conn: &Connection, id: &str) -> Result<()> {
     Ok(())
 }
 
+/// Updates the quantity of a specific card.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The UUID of the card.
+/// * `quantity` - The new quantity.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn update_card_quantity(conn: &Connection, id: &str, quantity: i32) -> Result<()> {
     conn.execute(
         "UPDATE cards SET quantity = ?1 WHERE id = ?2",
@@ -124,6 +191,17 @@ pub fn update_card_quantity(conn: &Connection, id: &str, quantity: i32) -> Resul
     Ok(())
 }
 
+/// Updates the current price of a specific card.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The UUID of the card.
+/// * `price` - The new price.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn update_card_price(conn: &Connection, id: &str, price: f64) -> Result<()> {
     conn.execute(
         "UPDATE cards SET current_price = ?1 WHERE id = ?2",
@@ -132,6 +210,19 @@ pub fn update_card_price(conn: &Connection, id: &str, price: f64) -> Result<()> 
     Ok(())
 }
 
+/// Inserts a price history entry for a card.
+/// If an entry already exists for the same card and date, it is updated.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `card_id` - The UUID of the card.
+/// * `price` - The price value.
+/// * `currency` - The currency code (e.g., "USD", "EUR").
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn insert_price_history(
     conn: &Connection,
     card_id: &str,
@@ -156,6 +247,19 @@ pub fn insert_price_history(
     Ok(())
 }
 
+/// Updates details of an existing card (condition, language, purchase price).
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The UUID of the card.
+/// * `condition` - The new condition.
+/// * `language` - The new language.
+/// * `purchase_price` - The new purchase price.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn update_card_details(
     conn: &Connection,
     id: &str,
@@ -172,6 +276,19 @@ pub fn update_card_details(
 
 // ============ Wishlist Operations ============
 
+/// Adds a card to the wishlist.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `card` - The Scryfall card data.
+/// * `target_price` - Optional target price.
+/// * `notes` - Optional notes.
+/// * `priority` - Priority level (1-3).
+///
+/// # Returns
+///
+/// * `Result<String>` - The UUID of the newly created wishlist item.
 pub fn add_to_wishlist(
     conn: &Connection,
     card: &ScryfallCard,
@@ -206,6 +323,15 @@ pub fn add_to_wishlist(
     Ok(id)
 }
 
+/// Retrieves all items from the wishlist, ordered by priority and date.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+///
+/// # Returns
+///
+/// * `Result<Vec<WishlistCard>>` - A vector of WishlistCard objects.
 pub fn get_wishlist(conn: &Connection) -> Result<Vec<crate::models::wishlist::WishlistCard>> {
     let mut stmt = conn.prepare(
         "SELECT id, scryfall_id, name, set_code, collector_number, image_uri, target_price, notes, added_date, priority
@@ -236,11 +362,34 @@ pub fn get_wishlist(conn: &Connection) -> Result<Vec<crate::models::wishlist::Wi
     Ok(wishlist)
 }
 
+/// Removes an item from the wishlist.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The UUID of the wishlist item.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn remove_from_wishlist(conn: &Connection, id: &str) -> Result<()> {
     conn.execute("DELETE FROM wishlist WHERE id = ?1", params![id])?;
     Ok(())
 }
 
+/// Updates a wishlist item.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `id` - The UUID of the wishlist item.
+/// * `target_price` - New target price.
+/// * `notes` - New notes.
+/// * `priority` - New priority.
+///
+/// # Returns
+///
+/// * `Result<()>` - Ok if successful, Err otherwise.
 pub fn update_wishlist_card(
     conn: &Connection,
     id: &str,
@@ -262,6 +411,16 @@ pub struct CardPriceHistoryPoint {
     pub currency: String,
 }
 
+/// Retrieves the price history for a specific card.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `card_id` - The UUID of the card.
+///
+/// # Returns
+///
+/// * `Result<Vec<CardPriceHistoryPoint>>` - A vector of price history points.
 pub fn get_card_price_history(
     conn: &Connection,
     card_id: &str,
@@ -289,6 +448,16 @@ pub fn get_card_price_history(
     Ok(history)
 }
 
+/// Calculates statistics for the entire collection.
+/// Includes total investment, current value, ROI, and top winners/losers.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+///
+/// # Returns
+///
+/// * `Result<CollectionStats>` - The calculated statistics.
 pub fn get_collection_stats(
     conn: &Connection,
 ) -> Result<crate::models::analytics::CollectionStats> {

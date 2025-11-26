@@ -21,6 +21,7 @@ const mockCard: CollectionCard = {
     is_foil: false,
     image_uri: 'https://example.com/image.jpg',
     language: 'English',
+    finish: 'nonfoil',
 };
 
 describe('EditCardModal', () => {

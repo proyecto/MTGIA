@@ -2,12 +2,22 @@ import { useMemo } from 'react';
 import { CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
+/**
+ * Props for the StatisticsModal component.
+ */
 interface StatisticsModalProps {
+    /** Whether the modal is currently visible */
     isOpen: boolean;
+    /** Callback to close the modal */
     onClose: () => void;
+    /** The list of cards to calculate statistics from */
     cards: CollectionCard[];
 }
 
+/**
+ * Modal that displays detailed statistics about the collection.
+ * Includes total value, card counts, most valuable cards, and set distribution.
+ */
 export default function StatisticsModal({ isOpen, onClose, cards }: StatisticsModalProps) {
     const { formatPrice } = useSettings();
 

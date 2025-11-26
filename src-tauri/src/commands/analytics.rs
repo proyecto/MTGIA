@@ -3,6 +3,15 @@ use crate::models::analytics::CollectionStats;
 use crate::AppState;
 use tauri::State;
 
+/// Calculates statistics for the entire collection.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<CollectionStats, String>` - The calculated statistics or an error message.
 #[tauri::command]
 pub async fn get_collection_stats(state: State<'_, AppState>) -> Result<CollectionStats, String> {
     let db = state

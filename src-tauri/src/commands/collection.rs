@@ -15,6 +15,18 @@ pub struct AddCardArgs {
     pub language: String,
 }
 
+/// Adds a new card to the user's collection.
+/// Fetches card data from Scryfall first.
+///
+/// # Arguments
+///
+/// * `state` - The application state containing the database connection.
+/// * `args` - The arguments for adding the card (Scryfall ID, condition, etc.).
+/// * `currency_preference` - The user's preferred currency.
+///
+/// # Returns
+///
+/// * `Result<String, String>` - The UUID of the added card or an error message.
 #[tauri::command]
 pub async fn add_card(
     state: State<'_, AppState>,
@@ -40,6 +52,15 @@ pub async fn add_card(
     Ok(id)
 }
 
+/// Searches for cards using the Scryfall API.
+///
+/// # Arguments
+///
+/// * `query` - The search query string.
+///
+/// # Returns
+///
+/// * `Result<Vec<ScryfallCard>, String>` - A list of matching cards or an error message.
 #[tauri::command]
 pub async fn search_scryfall(query: String) -> Result<Vec<ScryfallCard>, String> {
     let service = ScryfallService::new();
@@ -49,6 +70,15 @@ pub async fn search_scryfall(query: String) -> Result<Vec<ScryfallCard>, String>
         .map_err(|e| e.to_string())
 }
 
+/// Fetches a single card from Scryfall by its ID.
+///
+/// # Arguments
+///
+/// * `scryfall_id` - The Scryfall ID of the card.
+///
+/// # Returns
+///
+/// * `Result<ScryfallCard, String>` - The card data or an error message.
 #[tauri::command]
 pub async fn get_card(scryfall_id: String) -> Result<ScryfallCard, String> {
     let service = ScryfallService::new();
@@ -58,6 +88,15 @@ pub async fn get_card(scryfall_id: String) -> Result<ScryfallCard, String> {
         .map_err(|e| e.to_string())
 }
 
+/// Retrieves the entire collection of cards.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<Vec<CollectionCard>, String>` - The list of cards in the collection.
 #[tauri::command]
 pub async fn get_collection(
     state: State<'_, AppState>,
@@ -69,6 +108,16 @@ pub async fn get_collection(
     operations::get_all_cards(&db).map_err(|e| e.to_string())
 }
 
+/// Removes a card from the collection.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `id` - The UUID of the card to remove.
+///
+/// # Returns
+///
+/// * `Result<(), String>` - Ok if successful, or an error message.
 #[tauri::command]
 pub async fn remove_card(state: State<'_, AppState>, id: String) -> Result<(), String> {
     let db = state
@@ -78,6 +127,17 @@ pub async fn remove_card(state: State<'_, AppState>, id: String) -> Result<(), S
     operations::remove_card(&db, &id).map_err(|e| e.to_string())
 }
 
+/// Updates the quantity of a card in the collection.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `id` - The UUID of the card.
+/// * `quantity` - The new quantity.
+///
+/// # Returns
+///
+/// * `Result<(), String>` - Ok if successful, or an error message.
 #[tauri::command]
 pub async fn update_card_quantity(
     state: State<'_, AppState>,
@@ -91,6 +151,17 @@ pub async fn update_card_quantity(
     operations::update_card_quantity(&db, &id, quantity).map_err(|e| e.to_string())
 }
 
+/// Updates prices for all cards in the collection.
+/// This is a long-running operation that fetches latest prices from Scryfall.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `currency_preference` - The currency to use for price updates.
+///
+/// # Returns
+///
+/// * `Result<String, String>` - A summary message of the update operation.
 #[tauri::command]
 pub async fn update_prices(
     state: State<'_, AppState>,
@@ -139,6 +210,19 @@ pub async fn update_prices(
     Ok(format!("Updated prices for {} cards", updated_count))
 }
 
+/// Updates details of a specific card.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `id` - The UUID of the card.
+/// * `condition` - The new condition.
+/// * `language` - The new language.
+/// * `purchase_price` - The new purchase price.
+///
+/// # Returns
+///
+/// * `Result<(), String>` - Ok if successful, or an error message.
 #[tauri::command]
 pub async fn update_card_details(
     state: State<'_, AppState>,
@@ -162,6 +246,15 @@ pub struct PortfolioDataPoint {
     total_investment: f64,
 }
 
+/// Retrieves the history of the total portfolio value over time.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<Vec<PortfolioDataPoint>, String>` - A list of data points representing portfolio value history.
 #[tauri::command]
 pub async fn get_portfolio_history(
     state: State<'_, AppState>,
@@ -216,6 +309,16 @@ pub async fn get_portfolio_history(
     Ok(history)
 }
 
+/// Retrieves the price history for a specific card.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `card_id` - The UUID of the card.
+///
+/// # Returns
+///
+/// * `Result<Vec<CardPriceHistoryPoint>, String>` - A list of price history points.
 #[tauri::command]
 pub async fn get_card_price_history(
     state: State<'_, AppState>,
@@ -229,6 +332,15 @@ pub async fn get_card_price_history(
     operations::get_card_price_history(&db, &card_id).map_err(|e| e.to_string())
 }
 
+/// Exports the entire collection to a CSV string.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+///
+/// # Returns
+///
+/// * `Result<String, String>` - The CSV content string.
 #[tauri::command]
 pub async fn export_collection(state: State<'_, AppState>) -> Result<String, String> {
     let db = state
@@ -260,6 +372,16 @@ pub async fn export_collection(state: State<'_, AppState>) -> Result<String, Str
     Ok(csv)
 }
 
+/// Imports a collection from a CSV string.
+///
+/// # Arguments
+///
+/// * `state` - The application state.
+/// * `csv_content` - The CSV content to import.
+///
+/// # Returns
+///
+/// * `Result<String, String>` - A summary message of the import operation.
 #[tauri::command]
 pub async fn import_collection(
     state: State<'_, AppState>,

@@ -3,6 +3,11 @@ import { invoke } from '@tauri-apps/api/core';
 import { CollectionStats, CardPerformance } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
+/**
+ * Component that displays a detailed financial report of the collection.
+ * Shows investment vs current value, ROI, and top winners/losers.
+ * Allows exporting the report to CSV.
+ */
 export default function ProfitabilityReport() {
     const { formatPrice } = useSettings();
     const [stats, setStats] = useState<CollectionStats | null>(null);

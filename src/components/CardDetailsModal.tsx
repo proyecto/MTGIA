@@ -4,14 +4,26 @@ import { ScryfallCard, AddCardArgs, CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import CardPriceHistoryChart from './CardPriceHistoryChart';
 
+/**
+ * Props for the CardDetailsModal component.
+ */
 interface CardDetailsModalProps {
+    /** The Scryfall card data to display */
     card: ScryfallCard;
+    /** Callback to close the modal */
     onClose: () => void;
+    /** Callback triggered when a card is added or updated */
     onCardAdded?: () => void;
+    /** Mode of operation: 'add' (new card) or 'view' (existing collection card) */
     mode?: 'add' | 'view';
+    /** The existing collection card data (required if mode is 'view') */
     collectionCard?: CollectionCard;
 }
 
+/**
+ * Modal for viewing detailed card information and performing actions.
+ * Supports adding new cards to collection/wishlist or editing existing collection cards.
+ */
 export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'add', collectionCard }: CardDetailsModalProps) {
     const { currency, formatPrice } = useSettings();
     const [activeTab, setActiveTab] = useState<'collection' | 'wishlist'>('collection');

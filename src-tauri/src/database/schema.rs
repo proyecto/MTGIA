@@ -27,6 +27,7 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
             is_foil BOOLEAN DEFAULT 0,
             image_uri TEXT,
             language TEXT DEFAULT 'English',
+            finish TEXT DEFAULT 'nonfoil',
             FOREIGN KEY(set_code) REFERENCES sets(code)
         )",
         [],
@@ -88,6 +89,33 @@ pub fn migrate_database(conn: &Connection) -> Result<()> {
         }
         Err(e) => {
             println!("Migration check failed: {}", e);
+        }
+    }
+
+    // Check if finish column exists, if not add it
+    let finish_column_exists: Result<i32> = conn.query_row(
+        "SELECT COUNT(*) FROM pragma_table_info('cards') WHERE name='finish'",
+        [],
+        |row| row.get(0),
+    );
+
+    match finish_column_exists {
+        Ok(0) => {
+            // Column doesn't exist, add it
+            conn.execute(
+                "ALTER TABLE cards ADD COLUMN finish TEXT DEFAULT 'nonfoil'",
+                [],
+            )?;
+            // Update existing foil cards to have 'foil' finish
+            conn.execute("UPDATE cards SET finish = 'foil' WHERE is_foil = 1", [])?;
+            println!("Migration: Added 'finish' column to cards table and migrated foil cards");
+        }
+        Ok(_) => {
+            // Column already exists
+            println!("Migration: 'finish' column already exists");
+        }
+        Err(e) => {
+            println!("Migration check for finish failed: {}", e);
         }
     }
 

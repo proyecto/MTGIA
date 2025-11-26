@@ -3,6 +3,11 @@ import { invoke } from '@tauri-apps/api/core';
 import { WishlistCard, ScryfallCard } from '../types';
 
 
+/**
+ * Wishlist Page.
+ * Manages cards the user wants to acquire.
+ * Allows adding cards, setting target prices and priorities, and filtering.
+ */
 export default function Wishlist() {
     const [wishlist, setWishlist] = useState<WishlistCard[]>([]);
     const [filteredWishlist, setFilteredWishlist] = useState<WishlistCard[]>([]);

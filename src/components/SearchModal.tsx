@@ -2,13 +2,24 @@ import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ScryfallCard, AddCardArgs } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
+import FinishSelector from './FinishSelector';
 
+/**
+ * Props for the SearchModal component.
+ */
 interface SearchModalProps {
+    /** Whether the modal is currently visible */
     isOpen: boolean;
+    /** Callback to close the modal */
     onClose: () => void;
+    /** Callback triggered when a card is successfully added */
     onCardAdded: () => void;
 }
 
+/**
+ * Modal component for searching and adding cards from Scryfall.
+ * Allows users to search by name, view details, and configure card properties (condition, language, finish) before adding.
+ */
 export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModalProps) {
     const { currency } = useSettings();
     const [query, setQuery] = useState('');
@@ -20,7 +31,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
     const [quantity, setQuantity] = useState(1);
     const [condition, setCondition] = useState('NM');
     const [language, setLanguage] = useState('English');
-    const [isFoil, setIsFoil] = useState(false);
+    const [finish, setFinish] = useState('nonfoil');
     const [price, setPrice] = useState(0);
 
     useEffect(() => {
@@ -28,13 +39,13 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             // Auto-fill price based on selection and currency
             let priceStr;
             if (currency === 'EUR') {
-                priceStr = isFoil ? selectedCard.prices.eur_foil : selectedCard.prices.eur;
+                priceStr = finish.includes('foil') ? selectedCard.prices.eur_foil : selectedCard.prices.eur;
             } else {
-                priceStr = isFoil ? selectedCard.prices.usd_foil : selectedCard.prices.usd;
+                priceStr = finish.includes('foil') ? selectedCard.prices.usd_foil : selectedCard.prices.usd;
             }
             setPrice(priceStr ? parseFloat(priceStr) : 0);
         }
-    }, [selectedCard, isFoil, currency]);
+    }, [selectedCard, finish, currency]);
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(async () => {
@@ -64,7 +75,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             condition,
             purchase_price: price,
             quantity,
-            is_foil: isFoil,
+            is_foil: finish.includes('foil'),
             language,
         };
 
@@ -88,7 +99,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
         setQuantity(1);
         setCondition('NM');
         setLanguage('English');
-        setIsFoil(false);
+        setFinish('nonfoil');
         onClose();
     }
 
@@ -215,36 +226,33 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
                                         />
                                     </div>
-                                    <div className="flex items-end pb-2">
-                                        <label className="flex items-center space-x-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={isFoil}
-                                                onChange={(e) => setIsFoil(e.target.checked)}
-                                                className="rounded text-accent-blue focus:ring-accent-blue"
-                                            />
-                                            <span className="text-sm text-gray-700">Foil</span>
-                                        </label>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">Finish</label>
+                                        <FinishSelector
+                                            value={finish}
+                                            onChange={setFinish}
+                                        />
                                     </div>
-                                </div>
 
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Price ({currency === 'EUR' ? '€' : '$'})</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={price}
-                                        onChange={(e) => setPrice(parseFloat(e.target.value))}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
-                                    />
-                                </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">Purchase Price ({currency === 'EUR' ? '€' : '$'})</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={price}
+                                            onChange={(e) => setPrice(parseFloat(e.target.value))}
+                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
+                                        />
+                                    </div>
 
-                                <button
-                                    onClick={handleAddCard}
-                                    className="w-full btn-primary mt-4 flex justify-center items-center gap-2"
-                                >
-                                    <span>Add to Collection</span>
-                                </button>
+                                    <button
+                                        onClick={handleAddCard}
+                                        className="w-full btn-primary mt-4 flex justify-center items-center gap-2"
+                                    >
+                                        <span>Add to Collection</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}

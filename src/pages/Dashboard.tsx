@@ -4,6 +4,11 @@ import { useSettings } from '../contexts/SettingsContext';
 import PortfolioChart from '../components/PortfolioChart';
 import ProfitabilityReport from '../components/ProfitabilityReport';
 
+/**
+ * Dashboard Page.
+ * Provides an overview of the collection's value and performance.
+ * Includes price update functionality, portfolio value chart, and profitability report.
+ */
 export default function Dashboard() {
     const { currency } = useSettings();
     const [updating, setUpdating] = useState(false);

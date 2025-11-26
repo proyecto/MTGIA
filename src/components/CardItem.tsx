@@ -1,12 +1,23 @@
 import { CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
+/**
+ * Props for the CardItem component.
+ * Extends CollectionCard to include event handlers.
+ */
 interface CardItemProps extends CollectionCard {
+    /** Callback when the card is clicked */
     onClick?: () => void;
+    /** Callback when the edit button is clicked */
     onEdit?: () => void;
+    /** Callback when the delete button is clicked */
     onDelete?: () => void;
 }
 
+/**
+ * Displays a single card in the collection grid.
+ * Shows the card image, details, and action buttons on hover.
+ */
 export default function CardItem({
     name,
     image_uri,

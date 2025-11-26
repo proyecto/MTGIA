@@ -9,6 +9,12 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { CollectionCard, ScryfallCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
+/**
+ * Main Collection Page.
+ * Displays the user's card collection in a grid.
+ * Provides filtering (by name, set), sorting, and access to statistics.
+ * Handles adding, editing, and deleting cards.
+ */
 export default function Collection() {
     const [cards, setCards] = useState<CollectionCard[]>([]);
     const [loading, setLoading] = useState(true);
