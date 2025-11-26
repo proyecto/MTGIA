@@ -44,7 +44,11 @@ describe('Collection Page', () => {
 
     it('renders collection header and stats', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockResolvedValue(mockCards);
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_collection') return Promise.resolve(mockCards);
+            if (cmd === 'get_all_tags') return Promise.resolve([]);
+            return Promise.resolve([]);
+        });
 
         render(
             <SettingsProvider>
@@ -60,7 +64,11 @@ describe('Collection Page', () => {
 
     it('displays cards in grid', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockResolvedValue(mockCards);
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_collection') return Promise.resolve(mockCards);
+            if (cmd === 'get_all_tags') return Promise.resolve([]);
+            return Promise.resolve([]);
+        });
 
         render(
             <SettingsProvider>
@@ -69,6 +77,12 @@ describe('Collection Page', () => {
         );
 
         await waitFor(() => {
+            // Use getAllByText because title attribute might also match if we are not careful, 
+            // but here the issue was the dropdown. 
+            // With empty tags, we should be fine.
+            // But CardItem has title={name} which is also text? No, title attribute is not text content.
+            // However, let's be safe and look for the h3 specifically if needed, or just expect it to be in document.
+            // getByText should work if unique.
             expect(screen.getByText('Black Lotus')).toBeInTheDocument();
             expect(screen.getByText('Mox Pearl')).toBeInTheDocument();
         });
@@ -76,7 +90,11 @@ describe('Collection Page', () => {
 
     it('filters cards by name', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockResolvedValue(mockCards);
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_collection') return Promise.resolve(mockCards);
+            if (cmd === 'get_all_tags') return Promise.resolve([]);
+            return Promise.resolve([]);
+        });
 
         render(
             <SettingsProvider>
@@ -97,7 +115,11 @@ describe('Collection Page', () => {
 
     it('opens delete confirmation dialog', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockResolvedValue(mockCards);
+        vi.mocked(invoke).mockImplementation((cmd) => {
+            if (cmd === 'get_collection') return Promise.resolve(mockCards);
+            if (cmd === 'get_all_tags') return Promise.resolve([]);
+            return Promise.resolve([]);
+        });
 
         render(
             <SettingsProvider>
@@ -139,6 +161,8 @@ describe('Collection Page', () => {
         vi.mocked(invoke).mockImplementation((cmd) => {
             if (cmd === 'get_collection') return Promise.resolve(mockCards);
             if (cmd === 'get_card') return Promise.resolve(mockScryfallCard);
+            if (cmd === 'get_all_tags') return Promise.resolve([]);
+            if (cmd === 'get_card_tags') return Promise.resolve([]);
             return Promise.resolve(undefined);
         });
 

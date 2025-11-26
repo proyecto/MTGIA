@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { Tag } from '../types';
+import { TAG_COLORS } from '../constants';
 
 interface TagManagerProps {
     onClose: () => void;
@@ -51,25 +52,14 @@ export default function TagManager({ onClose }: TagManagerProps) {
         }
     };
 
-    const colors = [
-        '#EF4444', // Red
-        '#F97316', // Orange
-        '#F59E0B', // Amber
-        '#10B981', // Emerald
-        '#06B6D4', // Cyan
-        '#3B82F6', // Blue
-        '#6366F1', // Indigo
-        '#8B5CF6', // Violet
-        '#EC4899', // Pink
-        '#6B7280', // Gray
-    ];
+    const colors = TAG_COLORS;
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h3 className="text-lg font-semibold text-gray-900">Manage Tags</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>

@@ -301,7 +301,12 @@
 ### Gestión Avanzada
 - 📋 Importación desde Moxfield/Archidekt
 - 📋 Escaneo de cartas con cámara
-- 📋 Etiquetas personalizadas
+### Etiquetas Personalizadas (Custom Tags)
+- ✅ Crear etiquetas con colores personalizados
+- ✅ Asignar etiquetas a cartas
+- ✅ Filtrar colección por etiquetas
+- ✅ Gestión de etiquetas (crear/eliminar)
+- ✅ Visualización de etiquetas en la cuadrícula
 - 📋 Variantes específicas (etched foil, promo, etc.)
 
 ### Análisis

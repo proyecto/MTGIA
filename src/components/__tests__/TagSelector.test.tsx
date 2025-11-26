@@ -34,7 +34,7 @@ describe('TagSelector', () => {
         render(<TagSelector cardId="test-card-1" />);
 
         // Click manage tags
-        fireEvent.click(screen.getByText('+ Manage Tags'));
+        fireEvent.click(screen.getByText('+ Add Tag'));
 
         await waitFor(() => {
             expect(screen.getByText('Commander')).toBeInTheDocument();
@@ -45,12 +45,13 @@ describe('TagSelector', () => {
     it('creates a new tag', async () => {
         render(<TagSelector cardId="test-card-1" />);
 
-        fireEvent.click(screen.getByText('+ Manage Tags'));
+        fireEvent.click(screen.getByText('+ Add Tag'));
+        fireEvent.click(screen.getByText('Manage Tags...'));
 
-        const input = screen.getByPlaceholderText('Tag name...');
+        const input = screen.getByPlaceholderText('e.g., Commander, Trade, Foil');
         fireEvent.change(input, { target: { value: 'New Tag' } });
 
-        fireEvent.click(screen.getByText('Add'));
+        fireEvent.click(screen.getByText('Create Tag'));
 
         await waitFor(() => {
             expect(mockInvoke).toHaveBeenCalledWith('create_tag', expect.objectContaining({
@@ -62,7 +63,7 @@ describe('TagSelector', () => {
     it('toggles a tag on a card', async () => {
         render(<TagSelector cardId="test-card-1" />);
 
-        fireEvent.click(screen.getByText('+ Manage Tags'));
+        fireEvent.click(screen.getByText('+ Add Tag'));
 
         await waitFor(() => {
             screen.getByText('Commander');

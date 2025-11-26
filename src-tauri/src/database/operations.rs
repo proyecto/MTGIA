@@ -1067,4 +1067,56 @@ mod tests {
         assert_eq!(stats.top_losers[0].name, "Loser Card"); // Most negative gain first
         assert_eq!(stats.top_losers[0].total_gain, -10.0);
     }
+    #[test]
+    fn test_tag_operations() {
+        let conn = setup_test_db();
+
+        // Create tags
+        let tag1_id = create_tag(&conn, "Commander", "#EF4444").unwrap();
+        let tag2_id = create_tag(&conn, "Trade", "#3B82F6").unwrap();
+
+        // Get all tags
+        let tags = get_all_tags(&conn).unwrap();
+        assert_eq!(tags.len(), 2);
+        assert_eq!(tags[0].name, "Commander");
+        assert_eq!(tags[1].name, "Trade");
+
+        // Create card
+        insert_test_set(&conn);
+        let card = create_test_card();
+        let args = AddCardArgs {
+            scryfall_id: card.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+            language: "English".to_string(),
+        };
+        insert_card(&conn, "card-uuid-1", &card, &args, "USD").unwrap();
+
+        // Add tag to card
+        add_tag_to_card(&conn, "card-uuid-1", tag1_id).unwrap();
+
+        // Get card tags
+        let card_tags = get_card_tags(&conn, "card-uuid-1").unwrap();
+        assert_eq!(card_tags.len(), 1);
+        assert_eq!(card_tags[0].id, tag1_id);
+
+        // Add another tag
+        add_tag_to_card(&conn, "card-uuid-1", tag2_id).unwrap();
+        let card_tags = get_card_tags(&conn, "card-uuid-1").unwrap();
+        assert_eq!(card_tags.len(), 2);
+
+        // Remove tag from card
+        remove_tag_from_card(&conn, "card-uuid-1", tag1_id).unwrap();
+        let card_tags = get_card_tags(&conn, "card-uuid-1").unwrap();
+        assert_eq!(card_tags.len(), 1);
+        assert_eq!(card_tags[0].id, tag2_id);
+
+        // Delete tag
+        delete_tag(&conn, tag2_id).unwrap();
+        let tags = get_all_tags(&conn).unwrap();
+        assert_eq!(tags.len(), 1);
+        assert_eq!(tags[0].name, "Commander");
+    }
 }
