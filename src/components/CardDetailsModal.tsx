@@ -4,7 +4,9 @@ import { ScryfallCard, AddCardArgs, CollectionCard } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import CardPriceHistoryChart from './CardPriceHistoryChart';
 import TagSelector from './TagSelector';
+import FinishSelector from './FinishSelector';
 import { LANGUAGE_NAMES } from '../constants';
+import { isFinishFoil } from '../utils/cardFinishes';
 
 /**
  * Props for the CardDetailsModal component.
@@ -35,7 +37,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
     const [quantity, setQuantity] = useState(1);
     const [condition, setCondition] = useState('NM');
     const [language, setLanguage] = useState('en'); // Default to code 'en'
-    const [isFoil, setIsFoil] = useState(false);
+    const [finish, setFinish] = useState('nonfoil');
     const [price, setPrice] = useState(0);
 
     // Wishlist Form State
@@ -47,6 +49,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
     const [editCondition, setEditCondition] = useState('NM');
     const [editLanguage, setEditLanguage] = useState('en'); // Default to code 'en'
     const [editPurchasePrice, setEditPurchasePrice] = useState(0);
+    const [editFinish, setEditFinish] = useState('nonfoil');
 
     // Dynamic Language State
     const [availableLanguages, setAvailableLanguages] = useState<string[]>(['en']);
@@ -95,18 +98,19 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
         // Auto-fill price based on selection and currency
         let priceStr;
         if (currency === 'EUR') {
-            priceStr = isFoil ? card.prices.eur_foil : card.prices.eur;
+            priceStr = isFinishFoil(finish) ? card.prices.eur_foil : card.prices.eur;
         } else {
-            priceStr = isFoil ? card.prices.usd_foil : card.prices.usd;
+            priceStr = isFinishFoil(finish) ? card.prices.usd_foil : card.prices.usd;
         }
         setPrice(priceStr ? parseFloat(priceStr) : 0);
-    }, [card, isFoil, currency]);
+    }, [card, finish, currency]);
 
     useEffect(() => {
         // Initialize editable fields from collectionCard
         if (collectionCard) {
             setEditCondition(collectionCard.condition);
             setEditPurchasePrice(collectionCard.purchase_price);
+            setEditFinish(collectionCard.finish || 'nonfoil');
 
             // Map full name back to code
             const langName = collectionCard.language || 'English';
@@ -122,8 +126,9 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
             condition,
             purchase_price: price,
             quantity,
-            is_foil: isFoil,
+            is_foil: isFinishFoil(finish),
             language: LANGUAGE_NAMES[language] || language, // Map code to name
+            finish,
         };
 
         try {
@@ -169,6 +174,7 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                 condition: editCondition,
                 language: LANGUAGE_NAMES[editLanguage] || editLanguage, // Map code to name
                 purchasePrice: editPurchasePrice,
+                finish: editFinish,
             });
             if (onCardAdded) onCardAdded(); // Refresh collection
             alert('Changes saved successfully!');
@@ -308,6 +314,14 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                         />
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-lg">
+                                        <span className="block text-xs text-gray-500 uppercase mb-2">Finish</span>
+                                        <FinishSelector
+                                            value={editFinish}
+                                            onChange={setEditFinish}
+                                            className="w-full text-lg font-bold text-gray-900 bg-white border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-accent-blue focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
                                         <span className="block text-xs text-gray-500 uppercase mb-1">Current Value</span>
                                         <span className="text-2xl font-bold text-accent-blue">{formatPrice(collectionCard.current_price)}</span>
                                     </div>
@@ -403,16 +417,13 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-accent-blue focus:ring focus:ring-accent-blue focus:ring-opacity-50 p-2 border"
                                         />
                                     </div>
-                                    <div className="flex items-end pb-2">
-                                        <label className="flex items-center space-x-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={isFoil}
-                                                onChange={(e) => setIsFoil(e.target.checked)}
-                                                className="rounded text-accent-blue focus:ring-accent-blue"
-                                            />
-                                            <span className="text-sm text-gray-700">Foil</span>
-                                        </label>
+                                    <div className="flex-1">
+                                        <label htmlFor="finish" className="block text-sm font-medium text-gray-700 mb-1">Finish</label>
+                                        <FinishSelector
+                                            id="finish"
+                                            value={finish}
+                                            onChange={setFinish}
+                                        />
                                     </div>
                                 </div>
 
@@ -428,8 +439,8 @@ export default function CardDetailsModal({ card, onClose, onCardAdded, mode = 'a
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
                                         Market Price: {currency === 'EUR'
-                                            ? (isFoil ? card.prices.eur_foil : card.prices.eur) || 'N/A'
-                                            : (isFoil ? card.prices.usd_foil : card.prices.usd) || 'N/A'}
+                                            ? (isFinishFoil(finish) ? card.prices.eur_foil : card.prices.eur) || 'N/A'
+                                            : (isFinishFoil(finish) ? card.prices.usd_foil : card.prices.usd) || 'N/A'}
                                     </p>
                                 </div>
 

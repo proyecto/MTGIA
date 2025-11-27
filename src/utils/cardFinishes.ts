@@ -50,3 +50,12 @@ export const getFinishesByCategory = () => {
 
     return categories;
 };
+
+/**
+ * Determines if a finish represents a foil card.
+ * @param finish - The finish value to check
+ * @returns true if the finish is any type of foil, false otherwise
+ */
+export const isFinishFoil = (finish: string): boolean => {
+    return finish !== 'nonfoil';
+};

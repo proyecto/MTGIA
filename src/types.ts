@@ -98,6 +98,8 @@ export interface AddCardArgs {
     quantity: number;
     is_foil: boolean;
     language: string;
+    finish?: string;
+    tags?: string[];
 }
 
 /**

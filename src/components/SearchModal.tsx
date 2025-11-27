@@ -4,6 +4,7 @@ import { ScryfallCard, ScryfallCardList, AddCardArgs } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import FinishSelector from './FinishSelector';
 import { LANGUAGE_NAMES } from '../constants';
+import { isFinishFoil } from '../utils/cardFinishes';
 
 /**
  * Props for the SearchModal component.
@@ -47,9 +48,9 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             // Auto-fill price based on selection and currency
             let priceStr;
             if (currency === 'EUR') {
-                priceStr = finish.includes('foil') ? selectedCard.prices.eur_foil : selectedCard.prices.eur;
+                priceStr = isFinishFoil(finish) ? selectedCard.prices.eur_foil : selectedCard.prices.eur;
             } else {
-                priceStr = finish.includes('foil') ? selectedCard.prices.usd_foil : selectedCard.prices.usd;
+                priceStr = isFinishFoil(finish) ? selectedCard.prices.usd_foil : selectedCard.prices.usd;
             }
             setPrice(priceStr ? parseFloat(priceStr) : 0);
 
@@ -159,7 +160,7 @@ export default function SearchModal({ isOpen, onClose, onCardAdded }: SearchModa
             condition,
             purchase_price: price,
             quantity,
-            is_foil: finish.includes('foil'),
+            is_foil: isFinishFoil(finish),
 
             language: LANGUAGE_NAMES[language] || language,
         };

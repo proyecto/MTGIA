@@ -295,7 +295,7 @@ pub fn insert_price_history(
     Ok(())
 }
 
-/// Updates details of an existing card (condition, language, purchase price).
+/// Updates details of an existing card (condition, language, purchase price, finish).
 ///
 /// # Arguments
 ///
@@ -304,6 +304,7 @@ pub fn insert_price_history(
 /// * `condition` - The new condition.
 /// * `language` - The new language.
 /// * `purchase_price` - The new purchase price.
+/// * `finish` - The new finish.
 ///
 /// # Returns
 ///
@@ -314,10 +315,11 @@ pub fn update_card_details(
     condition: &str,
     language: &str,
     purchase_price: f64,
+    finish: &str,
 ) -> Result<()> {
     conn.execute(
-        "UPDATE cards SET condition = ?1, purchase_price = ?2, language = ?3 WHERE id = ?4",
-        params![condition, purchase_price, language, id],
+        "UPDATE cards SET condition = ?1, purchase_price = ?2, language = ?3, finish = ?4 WHERE id = ?5",
+        params![condition, purchase_price, language, finish, id],
     )?;
     Ok(())
 }
@@ -996,13 +998,14 @@ mod tests {
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
 
-        let result = update_card_details(&conn, "test-uuid-1", "LP", "Japanese", 15.0);
+        let result = update_card_details(&conn, "test-uuid-1", "LP", "Japanese", 15.0, "foil");
         assert!(result.is_ok());
 
         let cards = get_all_cards(&conn).unwrap();
         assert_eq!(cards[0].condition, "LP");
         assert_eq!(cards[0].language, "Japanese");
         assert_eq!(cards[0].purchase_price, 15.0);
+        assert_eq!(cards[0].finish, "foil");
     }
 
     #[test]
