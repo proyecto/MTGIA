@@ -28,13 +28,14 @@ export interface ScryfallCard {
     };
     /** Market prices in different currencies */
     prices: {
-        usd?: string;
-        usd_foil?: string;
-        eur?: string;
-        eur_foil?: string;
+        usd: string | null;
+        usd_foil: string | null;
+        eur: string | null;
+        eur_foil: string | null;
     };
     /** Rarity (common, uncommon, rare, mythic) */
     rarity: string;
+    similarity?: number; // Hamming distance (lower is better)
     /** Type line (e.g., "Creature — Elf Warrior") */
     type_line?: string;
     /** Oracle text (rules text) */
@@ -184,4 +185,26 @@ export interface Tag {
     id: number;
     name: string;
     color: string;
+}
+
+/**
+ * Visual features detected from a card image.
+ */
+export interface CardFeatures {
+    border_type: 'Black' | 'White' | 'Silver' | 'Unknown';
+    frame_color: 'Black' | 'Blue' | 'Red' | 'Green' | 'White' | 'Gold' | 'Land' | 'Unknown';
+    frame_style: 'OldFrame' | 'ModernFrame' | 'M15Frame' | 'Unknown';
+    has_corner_dots: boolean;
+    is_foil: boolean;
+}
+
+/**
+ * Result from visual card recognition.
+ */
+export interface RecognitionResult {
+    features: CardFeatures;
+    detected_name: string;
+    feature_description: string;
+    search_query: string;
+    candidates: ScryfallCard[];
 }

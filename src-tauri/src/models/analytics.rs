@@ -18,6 +18,10 @@ pub struct CollectionStats {
     pub total_value: f64,
     pub total_gain: f64,
     pub total_roi_percentage: f64,
+    pub total_cards: i32,
+    pub unique_cards: i32,
     pub top_winners: Vec<CardPerformance>,
     pub top_losers: Vec<CardPerformance>,
+    pub top_cards_by_price: Vec<CardPerformance>,
+    pub set_distribution: Vec<(String, i32)>,
 }

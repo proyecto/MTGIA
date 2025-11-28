@@ -1,0 +1,1663 @@
+
+> tauri-app@0.1.1 test
+> vitest
+
+
+[1m[44m DEV [49m[22m [34mv4.0.13 [39m[90m/Users/rafaelruiz/Documents/proyectos/MTGIA[39m
+
+[90mstderr[2m | src/components/__tests__/ProfitabilityReport.test.tsx[2m > [22m[2mProfitabilityReport[2m > [22m[2mdisplays error message when fetch fails
+[22m[39mFailed to fetch collection stats: Error: Failed to fetch
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/__tests__/ProfitabilityReport.test.tsx:68:38
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+ [32m✓[39m src/components/__tests__/ProfitabilityReport.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 82[2mms[22m[39m
+Not implemented: navigation to another Document
+ [32m✓[39m src/components/__tests__/EditCardModal.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 184[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/CardDetailsModal.test.tsx[2m > [22m[2mCardDetailsModal[2m > [22m[2mrenders card details correctly
+[22m[39mFailed to fetch languages: TypeError: Cannot read properties of undefined (reading 'length')
+    at fetchLanguages [90m(/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/CardDetailsModal.tsx:75:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/__tests__/CardDetailsModal.test.tsx[2m > [22m[2mCardDetailsModal[2m > [22m[2mswitches between Collection and Wishlist tabs
+[22m[39mFailed to fetch languages: TypeError: Cannot read properties of undefined (reading 'length')
+    at fetchLanguages [90m(/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/CardDetailsModal.tsx:75:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+Not implemented: Window's alert() method
+Not implemented: Window's alert() method
+ [32m✓[39m src/components/__tests__/CardDetailsModal.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2msearches for cards
+[22m[39mFrontend searching: "Test" Page: 1
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2msearches for cards
+[22m[39mSearch response: {
+  data: [
+    {
+      id: [32m'test-id-1'[39m,
+      name: [32m'Test Card 1'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'1'[39m,
+      rarity: [32m'common'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-1'[39m
+    },
+    {
+      id: [32m'test-id-2'[39m,
+      name: [32m'Test Card 2'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'2'[39m,
+      rarity: [32m'rare'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-2'[39m
+    }
+  ],
+  has_more: [33mfalse[39m,
+  total_cards: [33m2[39m
+}
+
+[90mstderr[2m | src/components/__tests__/ScannerModal.test.tsx[2m > [22m[2mScannerModal[2m > [22m[2mrenders file upload mode when camera access is denied
+[22m[39mCamera access denied: Error: Permission denied
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/__tests__/ScannerModal.test.tsx:92:44
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+[90mstdout[2m | src/components/__tests__/ScannerModal.test.tsx[2m > [22m[2mScannerModal[2m > [22m[2mscans and searches for a card using camera
+[22m[39mDetected features: {}
+Search query: 
+
+[90mstdout[2m | src/components/__tests__/ScannerModal.test.tsx[2m > [22m[2mScannerModal[2m > [22m[2mhandles file upload and scans the image
+[22m[39mDetected features: {}
+Search query: 
+
+ [32m✓[39m src/components/__tests__/ScannerModal.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/TagManager.test.tsx[2m > [22m[2mTagManager[2m > [22m[2mcloses the modal
+[22m[39mAn update to TagManager inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/__tests__/TagManager.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/CardPriceHistoryChart.test.tsx[2m > [22m[2mCardPriceHistoryChart[2m > [22m[2mdisplays error message when fetch fails
+[22m[39mFailed to fetch price history: Error: Failed to fetch
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/__tests__/CardPriceHistoryChart.test.tsx:48:38
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+ [32m✓[39m src/components/__tests__/CardPriceHistoryChart.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 56[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mFrontend searching: "Test" Page: 1
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mSearch response: {
+  data: [
+    {
+      id: [32m'test-id-1'[39m,
+      name: [32m'Test Card 1'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'1'[39m,
+      rarity: [32m'common'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-1'[39m
+    },
+    {
+      id: [32m'test-id-2'[39m,
+      name: [32m'Test Card 2'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'2'[39m,
+      rarity: [32m'rare'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-2'[39m
+    }
+  ],
+  has_more: [33mfalse[39m,
+  total_cards: [33m2[39m
+}
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mFetching languages for: Test Card 1 Oracle ID: oracle-id-1 Set: tst
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mReceived languages: [ [32m'en'[39m, [32m'fr'[39m ]
+
+ [32m✓[39m src/components/__tests__/TagSelector.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+[90mstderr[2m | src/pages/__tests__/MarketTrends.test.tsx[2m > [22m[2mMarketTrends[2m > [22m[2mhandles fetch error
+[22m[39mFailed to fetch market trends: Error: Failed to fetch
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/pages/__tests__/MarketTrends.test.tsx:89:45
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+ [32m✓[39m src/pages/__tests__/MarketTrends.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/Wishlist.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mFrontend searching: "Test" Page: 1
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mSearch response: {
+  data: [
+    {
+      id: [32m'test-id-1'[39m,
+      name: [32m'Test Card 1'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'1'[39m,
+      rarity: [32m'common'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-1'[39m
+    },
+    {
+      id: [32m'test-id-2'[39m,
+      name: [32m'Test Card 2'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'2'[39m,
+      rarity: [32m'rare'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-2'[39m
+    }
+  ],
+  has_more: [33mfalse[39m,
+  total_cards: [33m2[39m
+}
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mFetching languages for: Test Card 1 Oracle ID: oracle-id-1 Set: tst
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mReceived languages: [ [32m'en'[39m ]
+
+ [32m✓[39m src/components/__tests__/SearchModal.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1569[2mms[22m[39m
+     [33m[2m✓[22m[39m searches for cards [33m 514[2mms[22m[39m
+     [33m[2m✓[22m[39m selects a card and fetches languages [33m 521[2mms[22m[39m
+     [33m[2m✓[22m[39m adds a card to collection [33m 513[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/AllSets.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [31m❯[39m src/components/__tests__/StatisticsModal.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 2096[2mms[22m[39m
+     [32m✓[39m renders nothing when closed[32m 11[2mms[22m[39m
+[31m     [31m×[31m renders statistics when open[39m[33m 1011[2mms[22m[39m
+[31m     [31m×[31m displays top cards[39m[33m 1006[2mms[22m[39m
+     [32m✓[39m displays set distribution[32m 10[2mms[22m[39m
+     [32m✓[39m closes on button click[32m 57[2mms[22m[39m
+[90mstdout[2m | src/pages/__tests__/Collection.test.tsx[2m > [22m[2mCollection Page[2m > [22m[2mopens delete confirmation dialog
+[22m[39mDelete button clicked for card: 1
+
+ [32m✓[39m src/pages/__tests__/Collection.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 3142[2mms[22m[39m
+     [33m[2m✓[22m[39m renders collection header and stats [33m 555[2mms[22m[39m
+     [33m[2m✓[22m[39m displays cards in grid [33m 507[2mms[22m[39m
+     [33m[2m✓[22m[39m filters cards by name [33m 1017[2mms[22m[39m
+     [33m[2m✓[22m[39m opens delete confirmation dialog [33m 520[2mms[22m[39m
+     [33m[2m✓[22m[39m opens card details modal on click [33m 542[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/__tests__/StatisticsModal.test.tsx[2m > [22mStatisticsModal[2m > [22mrenders statistics when open
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: 2,000.00 €. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-lg font-bold text-gray-900"[39m
+          [36m>[39m
+            [0mCollection Statistics[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-gray-400 hover:text-gray-600"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"w-6 h-6"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M6 18L18 6M6 6l12 12"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-6 overflow-y-auto space-y-8"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-blue-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-blue-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mTotal Value[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-blue-900"[39m
+              [36m>[39m
+                [0m2000,00 €[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-purple-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-purple-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mTotal Cards[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-purple-900"[39m
+              [36m>[39m
+                [0m100[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-green-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-green-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mUnique[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-green-900"[39m
+              [36m>[39m
+                [0m80[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0m💎[0m
+              [36m</span>[39m
+              [0m Most Valuable Cards[0m
+            [36m</h3>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg border border-gray-100"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"font-medium text-gray-900"[39m
+                    [36m>[39m
+                      [0mBlack Lotus[0m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                    [36m>[39m
+                      [0mLEA[0m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"font-bold text-gray-900"[39m
+                [36m>[39m
+                  [0m5000,00 €[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0m📦[0m
+              [36m</span>[39m
+              [0m Top Sets by Count[0m
+            [36m</h3>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                [36m>[39m
+                  [0m#[0m
+                  [0m1[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                    [36m>[39m
+                      [0mlea[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0m10[0m
+                      [0m cards[0m
+                    [36m</span>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                      [33mstyle[39m=[32m"width: 10%;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                [36m>[39m
+                  [0m#[0m
+                  [0m2[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                    [36m>[39m
+                      [0mtst[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0m90[0m
+                      [0m cards[0m
+                    [36m</span>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                      [33mstyle[39m=[32m"width: 90%;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-lg font-bold text-gray-900"[39m
+            [36m>[39m
+              [0mCollection Statistics[0m
+            [36m</h2>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-gray-400 hover:text-gray-600"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"w-6 h-6"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M6 18L18 6M6 6l12 12"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 overflow-y-auto space-y-8"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"grid grid-cols-3 gap-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-blue-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-blue-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mTotal Value[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-blue-900"[39m
+                [36m>[39m
+                  [0m2000,00 €[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-purple-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-purple-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mTotal Cards[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-purple-900"[39m
+                [36m>[39m
+                  [0m100[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-green-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-green-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mUnique[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-green-900"[39m
+                [36m>[39m
+                  [0m80[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h3[39m
+                [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+              [36m>[39m
+                [36m<span>[39m
+                  [0m💎[0m
+                [36m</span>[39m
+                [0m Most Valuable Cards[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg border border-gray-100"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex items-center gap-3"[39m
+                  [36m>[39m
+                    [36m<div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"font-medium text-gray-900"[39m
+                      [36m>[39m
+                        [0mBlack Lotus[0m
+                      [36m</div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                      [36m>[39m
+                        [0mLEA[0m
+                      [36m</div>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"font-bold text-gray-900"[39m
+                  [36m>[39m
+                    [0m5000,00 €[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h3[39m
+                [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+              [36m>[39m
+                [36m<span>[39m
+                  [0m📦[0m
+                [36m</span>[39m
+                [0m Top Sets by Count[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                  [36m>[39m
+                    [0m#[0m
+                    [0m1[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex-1"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                      [36m>[39m
+                        [0mlea[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"text-gray-500"[39m
+                      [36m>[39m
+                        [0m10[0m
+                        [0m cards[0m
+                      [36m</span>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                        [33mstyle[39m=[32m"width: 10%;"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                  [36m>[39m
+                    [0m#[0m
+                    [0m2[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex-1"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                      [36m>[39m
+                        [0mtst[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"text-gray-500"[39m
+                      [36m>[39m
+                        [0m90[0m
+                        [0m cards[0m
+                      [36m</span>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                        [33mstyle[39m=[32m"width: 90%;"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/__tests__/StatisticsModal.test.tsx:[2m62:15[22m[39m
+    [90m 60| [39m        )[33m;[39m
+    [90m 61| [39m
+    [90m 62| [39m        [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m              [31m^[39m
+    [90m 63| [39m            expect(screen.getByText('Collection Statistics')).toBeInTh…
+    [90m 64| [39m            expect(screen.getByText('2,000.00 €')).toBeInTheDocument()…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/__tests__/StatisticsModal.test.tsx[2m > [22mStatisticsModal[2m > [22mdisplays top cards
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: 5,000.00 €. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-lg font-bold text-gray-900"[39m
+          [36m>[39m
+            [0mCollection Statistics[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-gray-400 hover:text-gray-600"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"w-6 h-6"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M6 18L18 6M6 6l12 12"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-6 overflow-y-auto space-y-8"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-blue-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-blue-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mTotal Value[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-blue-900"[39m
+              [36m>[39m
+                [0m2000,00 €[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-purple-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-purple-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mTotal Cards[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-purple-900"[39m
+              [36m>[39m
+                [0m100[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-green-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-green-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mUnique[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-green-900"[39m
+              [36m>[39m
+                [0m80[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0m💎[0m
+              [36m</span>[39m
+              [0m Most Valuable Cards[0m
+            [36m</h3>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg border border-gray-100"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"font-medium text-gray-900"[39m
+                    [36m>[39m
+                      [0mBlack Lotus[0m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                    [36m>[39m
+                      [0mLEA[0m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"font-bold text-gray-900"[39m
+                [36m>[39m
+                  [0m5000,00 €[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0m📦[0m
+              [36m</span>[39m
+              [0m Top Sets by Count[0m
+            [36m</h3>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                [36m>[39m
+                  [0m#[0m
+                  [0m1[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                    [36m>[39m
+                      [0mlea[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0m10[0m
+                      [0m cards[0m
+                    [36m</span>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                      [33mstyle[39m=[32m"width: 10%;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                [36m>[39m
+                  [0m#[0m
+                  [0m2[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                    [36m>[39m
+                      [0mtst[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0m90[0m
+                      [0m cards[0m
+                    [36m</span>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                      [33mstyle[39m=[32m"width: 90%;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-lg font-bold text-gray-900"[39m
+            [36m>[39m
+              [0mCollection Statistics[0m
+            [36m</h2>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-gray-400 hover:text-gray-600"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"w-6 h-6"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M6 18L18 6M6 6l12 12"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 overflow-y-auto space-y-8"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"grid grid-cols-3 gap-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-blue-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-blue-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mTotal Value[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-blue-900"[39m
+                [36m>[39m
+                  [0m2000,00 €[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-purple-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-purple-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mTotal Cards[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-purple-900"[39m
+                [36m>[39m
+                  [0m100[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-green-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-green-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mUnique[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-green-900"[39m
+                [36m>[39m
+                  [0m80[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h3[39m
+                [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+              [36m>[39m
+                [36m<span>[39m
+                  [0m💎[0m
+                [36m</span>[39m
+                [0m Most Valuable Cards[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg border border-gray-100"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex items-center gap-3"[39m
+                  [36m>[39m
+                    [36m<div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"font-medium text-gray-900"[39m
+                      [36m>[39m
+                        [0mBlack Lotus[0m
+                      [36m</div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                      [36m>[39m
+                        [0mLEA[0m
+                      [36m</div>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"font-bold text-gray-900"[39m
+                  [36m>[39m
+                    [0m5000,00 €[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h3[39m
+                [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+              [36m>[39m
+                [36m<span>[39m
+                  [0m📦[0m
+                [36m</span>[39m
+                [0m Top Sets by Count[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                  [36m>[39m
+                    [0m#[0m
+                    [0m1[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex-1"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                      [36m>[39m
+                        [0mlea[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"text-gray-500"[39m
+                      [36m>[39m
+                        [0m10[0m
+                        [0m cards[0m
+                      [36m</span>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                        [33mstyle[39m=[32m"width: 10%;"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                  [36m>[39m
+                    [0m#[0m
+                    [0m2[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex-1"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                      [36m>[39m
+                        [0mtst[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"text-gray-500"[39m
+                      [36m>[39m
+                        [0m90[0m
+                        [0m cards[0m
+                      [36m</span>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                        [33mstyle[39m=[32m"width: 90%;"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/__tests__/StatisticsModal.test.tsx:[2m82:15[22m[39m
+    [90m 80| [39m        )[33m;[39m
+    [90m 81| [39m
+    [90m 82| [39m        [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m              [31m^[39m
+    [90m 83| [39m            expect(screen.getByText('Black Lotus')).toBeInTheDocument(…
+    [90m 84| [39m            [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'lea'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m12 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m61 passed[39m[22m[90m (63)[39m
+[2m   Start at [22m 19:48:36
+[2m   Duration [22m 3.86s[2m (transform 382ms, setup 720ms, collect 792ms, tests 7.53s, environment 2.74s, prepare 51ms)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/__tests__/StatisticsModal.test.tsx [22m[34mx1 [34m[39m
+
+ [31m❯[39m src/components/__tests__/StatisticsModal.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1156[2mms[22m[39m
+     [32m✓[39m renders nothing when closed[32m 21[2mms[22m[39m
+     [32m✓[39m renders statistics when open[32m 43[2mms[22m[39m
+[31m     [31m×[31m displays top cards[39m[33m 1011[2mms[22m[39m
+     [32m✓[39m displays set distribution[32m 11[2mms[22m[39m
+     [32m✓[39m closes on button click[32m 69[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/__tests__/StatisticsModal.test.tsx[2m > [22mStatisticsModal[2m > [22mdisplays top cards
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: 5,000.00 €. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-lg font-bold text-gray-900"[39m
+          [36m>[39m
+            [0mCollection Statistics[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-gray-400 hover:text-gray-600"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mclass[39m=[32m"w-6 h-6"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M6 18L18 6M6 6l12 12"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-6 overflow-y-auto space-y-8"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-blue-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-blue-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mTotal Value[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-blue-900"[39m
+              [36m>[39m
+                [0m2000,00 €[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-purple-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-purple-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mTotal Cards[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-purple-900"[39m
+              [36m>[39m
+                [0m100[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-green-50 p-4 rounded-lg text-center"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-sm text-green-600 font-medium uppercase tracking-wider mb-1"[39m
+              [36m>[39m
+                [0mUnique[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-2xl font-bold text-green-900"[39m
+              [36m>[39m
+                [0m80[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0m💎[0m
+              [36m</span>[39m
+              [0m Most Valuable Cards[0m
+            [36m</h3>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg border border-gray-100"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"font-medium text-gray-900"[39m
+                    [36m>[39m
+                      [0mBlack Lotus[0m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                    [36m>[39m
+                      [0mLEA[0m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"font-bold text-gray-900"[39m
+                [36m>[39m
+                  [0m5000,00 €[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0m📦[0m
+              [36m</span>[39m
+              [0m Top Sets by Count[0m
+            [36m</h3>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                [36m>[39m
+                  [0m#[0m
+                  [0m1[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                    [36m>[39m
+                      [0mlea[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0m10[0m
+                      [0m cards[0m
+                    [36m</span>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                      [33mstyle[39m=[32m"width: 10%;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                [36m>[39m
+                  [0m#[0m
+                  [0m2[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                    [36m>[39m
+                      [0mtst[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0m90[0m
+                      [0m cards[0m
+                    [36m</span>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                      [33mstyle[39m=[32m"width: 90%;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-lg font-bold text-gray-900"[39m
+            [36m>[39m
+              [0mCollection Statistics[0m
+            [36m</h2>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-gray-400 hover:text-gray-600"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mclass[39m=[32m"w-6 h-6"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M6 18L18 6M6 6l12 12"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-6 overflow-y-auto space-y-8"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"grid grid-cols-3 gap-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-blue-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-blue-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mTotal Value[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-blue-900"[39m
+                [36m>[39m
+                  [0m2000,00 €[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-purple-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-purple-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mTotal Cards[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-purple-900"[39m
+                [36m>[39m
+                  [0m100[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-green-50 p-4 rounded-lg text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-green-600 font-medium uppercase tracking-wider mb-1"[39m
+                [36m>[39m
+                  [0mUnique[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-2xl font-bold text-green-900"[39m
+                [36m>[39m
+                  [0m80[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h3[39m
+                [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+              [36m>[39m
+                [36m<span>[39m
+                  [0m💎[0m
+                [36m</span>[39m
+                [0m Most Valuable Cards[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg border border-gray-100"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex items-center gap-3"[39m
+                  [36m>[39m
+                    [36m<div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"font-medium text-gray-900"[39m
+                      [36m>[39m
+                        [0mBlack Lotus[0m
+                      [36m</div>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                      [36m>[39m
+                        [0mLEA[0m
+                      [36m</div>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"font-bold text-gray-900"[39m
+                  [36m>[39m
+                    [0m5000,00 €[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h3[39m
+                [33mclass[39m=[32m"text-md font-bold text-gray-900 mb-3 flex items-center gap-2"[39m
+              [36m>[39m
+                [36m<span>[39m
+                  [0m📦[0m
+                [36m</span>[39m
+                [0m Top Sets by Count[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                  [36m>[39m
+                    [0m#[0m
+                    [0m1[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex-1"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                      [36m>[39m
+                        [0mlea[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"text-gray-500"[39m
+                      [36m>[39m
+                        [0m10[0m
+                        [0m cards[0m
+                      [36m</span>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                        [33mstyle[39m=[32m"width: 10%;"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center gap-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"w-8 text-center text-gray-400 font-mono text-sm"[39m
+                  [36m>[39m
+                    [0m#[0m
+                    [0m2[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"flex-1"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"flex justify-between text-sm mb-1"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-medium text-gray-700 uppercase"[39m
+                      [36m>[39m
+                        [0mtst[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"text-gray-500"[39m
+                      [36m>[39m
+                        [0m90[0m
+                        [0m cards[0m
+                      [36m</span>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"w-full bg-gray-100 rounded-full h-2"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"bg-accent-blue h-2 rounded-full"[39m
+                        [33mstyle[39m=[32m"width: 90%;"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/components/__tests__/StatisticsModal.test.tsx:[2m82:15[22m[39m
+    [90m 80| [39m        )[33m;[39m
+    [90m 81| [39m
+    [90m 82| [39m        [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m              [31m^[39m
+    [90m 83| [39m            expect(screen.getByText('Black Lotus')).toBeInTheDocument(…
+    [90m 84| [39m            [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'lea'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 19:50:05
+[2m   Duration [22m 1.29s
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/__tests__/StatisticsModal.test.tsx [22m[34mx2 [34m[39m
+
+ [32m✓[39m src/components/__tests__/StatisticsModal.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 19:50:07
+[2m   Duration [22m 148ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m

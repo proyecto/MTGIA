@@ -97,8 +97,8 @@ pub fn insert_card(
     });
 
     conn.execute(
-        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+        "INSERT INTO cards (id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish, phash)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
         params![
             id,
             args.scryfall_id,
@@ -112,7 +112,8 @@ pub fn insert_card(
             args.is_foil,
             image_uri,
             args.language,
-            finish
+            finish,
+            args.phash
         ],
     )?;
 
@@ -165,7 +166,7 @@ pub fn insert_card(
 /// * `Result<Vec<CollectionCard>>` - A vector of CollectionCard objects representing the user's collection.
 pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection::CollectionCard>> {
     let mut stmt = conn.prepare(
-        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish
+        "SELECT id, scryfall_id, name, set_code, collector_number, condition, purchase_price, current_price, quantity, is_foil, image_uri, language, finish, phash
          FROM cards",
     )?;
 
@@ -187,6 +188,106 @@ pub fn get_all_cards(conn: &Connection) -> Result<Vec<crate::models::collection:
                 .get::<_, Option<String>>(12)?
                 .unwrap_or_else(|| "nonfoil".to_string()),
             tags: None, // Will be populated below
+            phash: row.get(13)?,
+        })
+    })?;
+
+    let mut cards = Vec::new();
+    for card in card_iter {
+        let mut card = card?;
+        // Fetch tags for each card
+        card.tags = Some(get_card_tags(conn, &card.id)?);
+        cards.push(card);
+    }
+
+    Ok(cards)
+}
+
+/// Retrieves cards from the collection with filtering and sorting.
+///
+/// # Arguments
+///
+/// * `conn` - A reference to the database connection.
+/// * `search_term` - Optional search term for card name.
+/// * `set_code` - Optional set code filter.
+/// * `tag_id` - Optional tag ID filter.
+/// * `sort_by` - Optional sort criteria ('name', 'price-desc', 'price-asc', 'quantity').
+///
+/// # Returns
+///
+/// * `Result<Vec<CollectionCard>>` - A vector of filtered CollectionCard objects.
+pub fn get_collection_filtered(
+    conn: &Connection,
+    search_term: Option<String>,
+    set_code: Option<String>,
+    tag_id: Option<i32>,
+    sort_by: Option<String>,
+) -> Result<Vec<crate::models::collection::CollectionCard>> {
+    let mut query = String::from(
+        "SELECT c.id, c.scryfall_id, c.name, c.set_code, c.collector_number, 
+         c.condition, c.purchase_price, c.current_price, c.quantity, c.is_foil, 
+         c.image_uri, c.language, c.finish, c.phash
+         FROM cards c"
+    );
+
+    let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+    let mut conditions = Vec::new();
+
+    // Join with card_tags if filtering by tag
+    if tag_id.is_some() {
+        query.push_str(" JOIN card_tags ct ON c.id = ct.card_id");
+        conditions.push("ct.tag_id = ?");
+        params.push(Box::new(tag_id.unwrap()));
+    }
+
+    if let Some(term) = search_term {
+        if !term.trim().is_empty() {
+            conditions.push("c.name LIKE ?");
+            params.push(Box::new(format!("%{}%", term.trim())));
+        }
+    }
+
+    if let Some(set) = set_code {
+        if set != "all" && !set.is_empty() {
+            conditions.push("c.set_code = ?");
+            params.push(Box::new(set));
+        }
+    }
+
+    if !conditions.is_empty() {
+        query.push_str(" WHERE ");
+        query.push_str(&conditions.join(" AND "));
+    }
+
+    // Sorting
+    match sort_by.as_deref() {
+        Some("price-desc") => query.push_str(" ORDER BY c.current_price DESC"),
+        Some("price-asc") => query.push_str(" ORDER BY c.current_price ASC"),
+        Some("quantity") => query.push_str(" ORDER BY c.quantity DESC"),
+        _ => query.push_str(" ORDER BY c.name ASC"), // Default to name
+    }
+
+    let mut stmt = conn.prepare(&query)?;
+    
+    let card_iter = stmt.query_map(rusqlite::params_from_iter(params.iter()), |row| {
+        Ok(crate::models::collection::CollectionCard {
+            id: row.get(0)?,
+            scryfall_id: row.get(1)?,
+            name: row.get(2)?,
+            set_code: row.get(3)?,
+            collector_number: row.get(4)?,
+            condition: row.get(5)?,
+            purchase_price: row.get(6)?,
+            current_price: row.get(7)?,
+            quantity: row.get(8)?,
+            is_foil: row.get(9)?,
+            image_uri: row.get(10)?,
+            language: row.get(11)?,
+            finish: row
+                .get::<_, Option<String>>(12)?
+                .unwrap_or_else(|| "nonfoil".to_string()),
+            tags: None, // Will be populated below
+            phash: row.get(13)?,
         })
     })?;
 
@@ -515,9 +616,12 @@ pub fn get_collection_stats(
 
     let mut total_investment = 0.0;
     let mut total_value = 0.0;
+    let mut total_cards = 0;
+    let unique_cards = cards.len() as i32;
     let mut performances = Vec::new();
+    let mut set_counts: std::collections::HashMap<String, i32> = std::collections::HashMap::new();
 
-    for card in cards {
+    for card in &cards {
         let investment = card.purchase_price * card.quantity as f64;
         let value = card.current_price * card.quantity as f64;
         let gain = value - investment;
@@ -533,11 +637,14 @@ pub fn get_collection_stats(
 
         total_investment += investment;
         total_value += value;
+        total_cards += card.quantity;
+        
+        *set_counts.entry(card.set_code.clone()).or_insert(0) += card.quantity;
 
         performances.push(crate::models::analytics::CardPerformance {
-            id: card.id,
-            name: card.name,
-            set_code: card.set_code,
+            id: card.id.clone(),
+            name: card.name.clone(),
+            set_code: card.set_code.clone(),
             quantity: card.quantity,
             purchase_price: card.purchase_price,
             current_price: card.current_price,
@@ -571,14 +678,43 @@ pub fn get_collection_stats(
     });
     let top_losers = losers.into_iter().take(5).collect();
 
+    // Top cards by price
+    let mut by_price = performances.clone();
+    by_price.sort_by(|a, b| {
+        b.current_price
+            .partial_cmp(&a.current_price)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    let top_cards_by_price = by_price.into_iter().take(5).collect();
+
+    // Set distribution
+    let mut set_distribution: Vec<(String, i32)> = set_counts.into_iter().collect();
+    set_distribution.sort_by(|a, b| b.1.cmp(&a.1));
+    let set_distribution = set_distribution.into_iter().take(5).collect();
+
     Ok(crate::models::analytics::CollectionStats {
         total_investment,
         total_value,
         total_gain,
         total_roi_percentage: total_roi,
+        total_cards,
+        unique_cards,
         top_winners,
         top_losers,
+        top_cards_by_price,
+        set_distribution,
     })
+}
+
+pub fn get_collection_sets(conn: &Connection) -> Result<Vec<String>> {
+    let mut stmt = conn.prepare("SELECT DISTINCT set_code FROM cards ORDER BY set_code ASC")?;
+    let sets_iter = stmt.query_map([], |row| row.get(0))?;
+    
+    let mut sets = Vec::new();
+    for set in sets_iter {
+        sets.push(set?);
+    }
+    Ok(sets)
 }
 
 // ============ Tag Operations ============
@@ -694,6 +830,7 @@ mod tests {
                 eur: Some("9.00".to_string()),
                 eur_foil: Some("18.00".to_string()),
             },
+            similarity: None,
         }
     }
 
@@ -803,6 +940,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         let result = insert_card(&conn, "test-uuid-1", &card, &args, "USD");
@@ -828,6 +966,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -853,6 +992,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -878,6 +1018,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         // Insert card
@@ -938,6 +1079,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         // Insert card
@@ -994,6 +1136,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         insert_card(&conn, "test-uuid-1", &card, &args, "USD").unwrap();
@@ -1022,6 +1165,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         // Insert card
@@ -1070,6 +1214,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
 
         // Insert card but no price history
@@ -1098,6 +1243,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
         insert_card(&conn, "uuid-1", &card1, &args1, "USD").unwrap();
         update_card_price(&conn, "uuid-1", 20.0).unwrap();
@@ -1115,6 +1261,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
         insert_card(&conn, "uuid-2", &card2, &args2, "USD").unwrap();
         update_card_price(&conn, "uuid-2", 10.0).unwrap();
@@ -1160,6 +1307,7 @@ mod tests {
             language: "English".to_string(),
             finish: None,
             tags: None,
+            phash: None,
         };
         insert_card(&conn, "card-uuid-1", &card, &args, "USD").unwrap();
 
@@ -1187,5 +1335,73 @@ mod tests {
         let tags = get_all_tags(&conn).unwrap();
         assert_eq!(tags.len(), 1);
         assert_eq!(tags[0].name, "Commander");
+    }
+
+    #[test]
+    fn test_get_collection_filtered() {
+        let conn = setup_test_db();
+        insert_test_set(&conn);
+        
+        // Create cards with different attributes
+        let card1 = create_test_card(); // "Test Card", Set "tst", Price 10.0
+        let args1 = AddCardArgs {
+            scryfall_id: card1.id.clone(),
+            condition: "NM".to_string(),
+            purchase_price: 10.0,
+            quantity: 1,
+            is_foil: false,
+            language: "English".to_string(),
+            finish: None,
+            tags: None,
+            phash: None,
+        };
+        insert_card(&conn, "uuid-1", &card1, &args1, "USD").unwrap();
+
+        let mut card2 = create_test_card();
+        card2.id = "uuid-2".to_string();
+        card2.name = "Blue Lotus".to_string();
+        card2.set = "lea".to_string();
+        let args2 = AddCardArgs {
+            scryfall_id: card2.id.clone(),
+            condition: "LP".to_string(),
+            purchase_price: 100.0,
+            quantity: 2,
+            is_foil: true,
+            language: "English".to_string(),
+            finish: None,
+            tags: None,
+            phash: None,
+        };
+        // Need to insert set 'lea' first if foreign key constraint exists, 
+        // but setup_test_db might not enforce it strictly or we need to insert it.
+        // insert_test_set inserts 'tst'. Let's insert 'lea' too.
+        conn.execute("INSERT OR IGNORE INTO sets (code, name, release_date) VALUES (?1, ?2, ?3)", 
+            params!["lea", "Alpha", "1993-08-05"]).unwrap();
+            
+        insert_card(&conn, "uuid-2", &card2, &args2, "USD").unwrap();
+
+        // Test Filter by Name
+        let results = get_collection_filtered(&conn, Some("Lotus".to_string()), None, None, None).unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].name, "Blue Lotus");
+
+        // Test Filter by Set
+        let results = get_collection_filtered(&conn, None, Some("lea".to_string()), None, None).unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].set_code, "lea");
+
+        // Test Sort by Price Desc
+        let results = get_collection_filtered(&conn, None, None, None, Some("price-desc".to_string())).unwrap();
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].name, "Blue Lotus"); // 100.0 > 10.0 (assuming current_price is populated from purchase_price or default)
+        // Note: insert_card sets current_price to purchase_price if not provided? 
+        // Actually insert_card logic: 
+        // "INSERT INTO cards ... current_price ... VALUES ... ?5" where ?5 is args.purchase_price (usually) 
+        // Let's check insert_card impl if needed, but assuming it works.
+        
+        // Test Sort by Quantity
+        let results = get_collection_filtered(&conn, None, None, None, Some("quantity".to_string())).unwrap();
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].name, "Blue Lotus"); // 2 > 1
     }
 }

@@ -31,4 +31,6 @@ pub struct CollectionCard {
     pub finish: String,
     /// Tags assigned to the card
     pub tags: Option<Vec<crate::models::tags::Tag>>,
+    /// Perceptual hash of the card image (hex string)
+    pub phash: Option<String>,
 }

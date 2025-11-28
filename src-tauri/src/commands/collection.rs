@@ -15,6 +15,7 @@ pub struct AddCardArgs {
     pub language: String,
     pub finish: Option<String>,
     pub tags: Option<Vec<String>>, // List of "Name:Color" strings
+    pub phash: Option<String>, // Hex string of pHash
 }
 
 /// Adds a new card to the user's collection.
@@ -115,11 +116,15 @@ pub async fn get_card_languages(
         .map_err(|e| e.to_string())
 }
 
-/// Retrieves the entire collection of cards.
+/// Retrieves the entire collection of cards with optional filtering.
 ///
 /// # Arguments
 ///
 /// * `state` - The application state.
+/// * `search_term` - Optional search term for card name.
+/// * `set_code` - Optional set code filter.
+/// * `tag_id` - Optional tag ID filter.
+/// * `sort_by` - Optional sort criteria.
 ///
 /// # Returns
 ///
@@ -127,12 +132,26 @@ pub async fn get_card_languages(
 #[tauri::command]
 pub async fn get_collection(
     state: State<'_, AppState>,
+    search_term: Option<String>,
+    set_code: Option<String>,
+    tag_id: Option<i32>,
+    sort_by: Option<String>,
 ) -> Result<Vec<crate::models::collection::CollectionCard>, String> {
     let db = state
         .db
         .lock()
         .map_err(|_| "Failed to lock db".to_string())?;
-    operations::get_all_cards(&db).map_err(|e| e.to_string())
+    operations::get_collection_filtered(&db, search_term, set_code, tag_id, sort_by)
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn get_collection_sets(state: State<'_, AppState>) -> Result<Vec<String>, String> {
+    let db = state
+        .db
+        .lock()
+        .map_err(|_| "Failed to lock db".to_string())?;
+    operations::get_collection_sets(&db).map_err(|e| e.to_string())
 }
 
 /// Removes a card from the collection.
@@ -508,6 +527,7 @@ pub async fn import_collection(
                 language: card.language,
                 finish: Some(card.finish),
                 tags: card.tags.map(|t| vec![t]),
+                phash: None, // Import doesn't have phash yet, will be calculated later
             };
 
             {
@@ -532,4 +552,86 @@ pub async fn import_collection(
         "Imported {} cards, skipped {} cards",
         imported, skipped
     ))
+}
+
+/// Background task to calculate pHashes for cards that don't have them.
+/// Downloads the image, calculates dHash, and updates the database.
+#[tauri::command]
+pub async fn calculate_missing_hashes(state: State<'_, AppState>) -> Result<String, String> {
+    use crate::card_features::calculate_phash;
+    use image::load_from_memory;
+    
+    // 1. Get all cards without phash
+    let cards_to_process = {
+        let db = state.db.lock().map_err(|_| "Failed to lock db".to_string())?;
+        let mut stmt = db.prepare(
+            "SELECT id, name, image_uri FROM cards WHERE phash IS NULL AND image_uri IS NOT NULL AND image_uri != ''"
+        ).map_err(|e| e.to_string())?;
+        
+        let card_iter = stmt.query_map([], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+            ))
+        }).map_err(|e| e.to_string())?;
+        
+        let mut cards = Vec::new();
+        for card in card_iter {
+            if let Ok(c) = card {
+                cards.push(c);
+            }
+        }
+        cards
+    };
+    
+    if cards_to_process.is_empty() {
+        return Ok("No cards need indexing".to_string());
+    }
+    
+    println!("Found {} cards to index", cards_to_process.len());
+    
+    let client = reqwest::Client::new();
+    let mut success_count = 0;
+    let mut fail_count = 0;
+    
+    for (id, name, url) in cards_to_process {
+        // Download image
+        match client.get(&url).send().await {
+            Ok(resp) => {
+                if let Ok(bytes) = resp.bytes().await {
+                    if let Ok(img) = load_from_memory(&bytes) {
+                        // Calculate hash
+                        let hash = calculate_phash(&img);
+                        let hash_str = format!("{:x}", hash);
+                        
+                        // Update DB
+                        let db = state.db.lock().map_err(|_| "Failed to lock db".to_string())?;
+                        db.execute(
+                            "UPDATE cards SET phash = ?1 WHERE id = ?2",
+                            rusqlite::params![hash_str, id],
+                        ).map_err(|e| e.to_string())?;
+                        
+                        success_count += 1;
+                        println!("Indexed {}: {}", name, hash_str);
+                    } else {
+                        println!("Failed to decode image for {}", name);
+                        fail_count += 1;
+                    }
+                } else {
+                    println!("Failed to get bytes for {}", name);
+                    fail_count += 1;
+                }
+            }
+            Err(e) => {
+                println!("Failed to download image for {}: {}", name, e);
+                fail_count += 1;
+            }
+        }
+        
+        // Be nice to Scryfall/Network
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+    
+    Ok(format!("Indexed {} cards, failed {}", success_count, fail_count))
 }

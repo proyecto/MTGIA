@@ -42,6 +42,8 @@ pub struct ScryfallCard {
     pub image_uris: Option<ImageUris>,
     pub prices: Prices,
     pub rarity: String,
+    #[serde(default, skip_deserializing)]
+    pub similarity: Option<u32>, // Hamming distance (lower is better)
 }
 
 /// Represents the image URIs for a card.

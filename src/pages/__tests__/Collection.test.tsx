@@ -47,6 +47,7 @@ describe('Collection Page', () => {
         vi.mocked(invoke).mockImplementation((cmd) => {
             if (cmd === 'get_collection') return Promise.resolve(mockCards);
             if (cmd === 'get_all_tags') return Promise.resolve([]);
+            if (cmd === 'get_collection_sets') return Promise.resolve(['lea']);
             return Promise.resolve([]);
         });
 
@@ -59,7 +60,7 @@ describe('Collection Page', () => {
         await waitFor(() => {
             expect(screen.getByText('My Collection')).toBeInTheDocument();
             expect(screen.getByText('3 cards collected')).toBeInTheDocument(); // 1 + 2
-        });
+        }, { timeout: 2000 });
     });
 
     it('displays cards in grid', async () => {
@@ -67,6 +68,7 @@ describe('Collection Page', () => {
         vi.mocked(invoke).mockImplementation((cmd) => {
             if (cmd === 'get_collection') return Promise.resolve(mockCards);
             if (cmd === 'get_all_tags') return Promise.resolve([]);
+            if (cmd === 'get_collection_sets') return Promise.resolve(['lea']);
             return Promise.resolve([]);
         });
 
@@ -77,22 +79,22 @@ describe('Collection Page', () => {
         );
 
         await waitFor(() => {
-            // Use getAllByText because title attribute might also match if we are not careful, 
-            // but here the issue was the dropdown. 
-            // With empty tags, we should be fine.
-            // But CardItem has title={name} which is also text? No, title attribute is not text content.
-            // However, let's be safe and look for the h3 specifically if needed, or just expect it to be in document.
-            // getByText should work if unique.
             expect(screen.getByText('Black Lotus')).toBeInTheDocument();
             expect(screen.getByText('Mox Pearl')).toBeInTheDocument();
-        });
+        }, { timeout: 2000 });
     });
 
     it('filters cards by name', async () => {
         const { invoke } = await import('@tauri-apps/api/core');
-        vi.mocked(invoke).mockImplementation((cmd) => {
-            if (cmd === 'get_collection') return Promise.resolve(mockCards);
+        vi.mocked(invoke).mockImplementation((cmd, args: any) => {
+            if (cmd === 'get_collection') {
+                if (args?.searchTerm === 'Lotus') {
+                    return Promise.resolve([mockCards[0]]);
+                }
+                return Promise.resolve(mockCards);
+            }
             if (cmd === 'get_all_tags') return Promise.resolve([]);
+            if (cmd === 'get_collection_sets') return Promise.resolve(['lea']);
             return Promise.resolve([]);
         });
 
@@ -104,13 +106,19 @@ describe('Collection Page', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Black Lotus')).toBeInTheDocument();
-        });
+        }, { timeout: 2000 });
 
         const searchInput = screen.getByPlaceholderText('Filter by name...');
         fireEvent.change(searchInput, { target: { value: 'Lotus' } });
 
-        expect(screen.getByText('Black Lotus')).toBeInTheDocument();
-        expect(screen.queryByText('Mox Pearl')).not.toBeInTheDocument();
+        // Wait for debounce and effect
+        await waitFor(() => {
+            expect(invoke).toHaveBeenCalledWith('get_collection', expect.objectContaining({
+                searchTerm: 'Lotus'
+            }));
+            expect(screen.getByText('Black Lotus')).toBeInTheDocument();
+            expect(screen.queryByText('Mox Pearl')).not.toBeInTheDocument();
+        }, { timeout: 2000 });
     });
 
     it('opens delete confirmation dialog', async () => {
@@ -118,6 +126,7 @@ describe('Collection Page', () => {
         vi.mocked(invoke).mockImplementation((cmd) => {
             if (cmd === 'get_collection') return Promise.resolve(mockCards);
             if (cmd === 'get_all_tags') return Promise.resolve([]);
+            if (cmd === 'get_collection_sets') return Promise.resolve(['lea']);
             return Promise.resolve([]);
         });
 
@@ -129,7 +138,7 @@ describe('Collection Page', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Black Lotus')).toBeInTheDocument();
-        });
+        }, { timeout: 2000 });
 
         // Hover over card to show delete button (simulated by just finding the button since hover is hard in jsdom)
         // Note: The delete button is rendered but hidden with opacity. We can still click it in tests.
@@ -163,6 +172,7 @@ describe('Collection Page', () => {
             if (cmd === 'get_card') return Promise.resolve(mockScryfallCard);
             if (cmd === 'get_all_tags') return Promise.resolve([]);
             if (cmd === 'get_card_tags') return Promise.resolve([]);
+            if (cmd === 'get_collection_sets') return Promise.resolve(['lea']);
             return Promise.resolve(undefined);
         });
 
@@ -174,7 +184,7 @@ describe('Collection Page', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Black Lotus')).toBeInTheDocument();
-        });
+        }, { timeout: 2000 });
 
         fireEvent.click(screen.getByText('Black Lotus'));
 
@@ -182,6 +192,6 @@ describe('Collection Page', () => {
             expect(invoke).toHaveBeenCalledWith('get_card', { scryfallId: 'abc123' });
             expect(screen.getByText('Card Details')).toBeInTheDocument();
             expect(screen.getByText('Limited Edition Alpha')).toBeInTheDocument();
-        });
+        }, { timeout: 2000 });
     });
 });

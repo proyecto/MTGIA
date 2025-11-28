@@ -17,6 +17,7 @@ import { useSettings } from '../contexts/SettingsContext';
  * Handles adding, editing, and deleting cards.
  */
 export default function Collection() {
+    const { formatPrice } = useSettings();
     const [cards, setCards] = useState<CollectionCard[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,6 +25,7 @@ export default function Collection() {
     const [selectedSet, setSelectedSet] = useState<string>('all');
     const [selectedTag, setSelectedTag] = useState<string>('all');
     const [allTags, setAllTags] = useState<Tag[]>([]);
+    const [uniqueSets, setUniqueSets] = useState<string[]>([]);
     const [isStatsOpen, setIsStatsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [cardToEdit, setCardToEdit] = useState<CollectionCard | null>(null);
@@ -37,18 +39,42 @@ export default function Collection() {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     useEffect(() => {
-        loadCollection();
         loadTags();
+        loadSets();
     }, []);
 
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            loadCollection();
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, selectedSet, selectedTag, sortOption]);
+
     async function loadCollection() {
+        setLoading(true);
         try {
-            const result = await invoke<CollectionCard[]>('get_collection');
+            const result = await invoke<CollectionCard[]>('get_collection', {
+                searchTerm: searchTerm,
+                setCode: selectedSet,
+                tagId: selectedTag === 'all' ? null : parseInt(selectedTag),
+                sortBy: sortOption
+            });
             setCards(result);
         } catch (error) {
             console.error('Failed to load collection:', error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function loadSets() {
+        try {
+            const sets = await invoke<string[]>('get_collection_sets');
+            // uniqueSets state needs to be added
+            setUniqueSets(sets);
+        } catch (error) {
+            console.error('Failed to load sets:', error);
         }
     }
 
@@ -75,6 +101,7 @@ export default function Collection() {
             await invoke('remove_card', { id: cardToDelete });
             console.log('Card deleted successfully');
             loadCollection();
+            loadSets(); // Reload sets in case the last card of a set was deleted
         } catch (error) {
             console.error("Failed to delete card:", error);
             alert(`Failed to delete card: ${error}`);
@@ -108,46 +135,18 @@ export default function Collection() {
         }
     }
 
-    if (loading) {
+    if (loading && cards.length === 0) {
         return <div className="flex items-center justify-center h-full text-gray-400">Loading collection...</div>;
     }
 
-    // Filter and Sort Logic
-    const filteredCards = cards.filter(card => {
-        const matchesSearch = card.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesSet = selectedSet === 'all' || card.set_code === selectedSet;
+    // Client-side filtering removed. 'cards' now contains the filtered list.
+    const sortedCards = cards;
 
-        if (selectedTag !== 'all') {
-            const tagId = parseInt(selectedTag);
-            if (!card.tags || !card.tags.some(t => t.id === tagId)) {
-                return false;
-            }
-        }
-
-        return matchesSearch && matchesSet;
-    });
-
-    const sortedCards = [...filteredCards].sort((a, b) => {
-        switch (sortOption) {
-            case 'name':
-                return a.name.localeCompare(b.name);
-            case 'price-desc':
-                return b.current_price - a.current_price;
-            case 'price-asc':
-                return a.current_price - b.current_price;
-            case 'quantity':
-                return b.quantity - a.quantity;
-            default:
-                return 0;
-        }
-    });
-
-    // Get unique sets for filter
-    const uniqueSets = Array.from(new Set(cards.map(c => c.set_code))).sort();
-
-    // Moved these declarations outside the conditional loading block
+    // Total value calculation might be inaccurate if filtered, but maybe that's desired?
+    // Usually "Total Value" implies the whole collection.
+    // However, if I filter, I might want to see the value of the filtered view.
+    // Let's keep it as sum of displayed cards for now, which is consistent with "filtered view".
     const totalValue = cards.reduce((sum, card) => sum + (card.current_price * card.quantity), 0);
-    const { formatPrice } = useSettings();
 
     return (
         <div className="space-y-6">

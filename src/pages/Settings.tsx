@@ -158,7 +158,35 @@ export default function Settings() {
         </div>
       </section>
 
-      {/* Database Management */}
+      {/* Offline Recognition Settings */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Offline Recognition</h2>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-600 mb-2">
+              Index your collection to enable instant, offline card recognition. This downloads images and calculates visual hashes for all your cards.
+            </p>
+            <button
+              onClick={async () => {
+                setImportMessage('Indexing collection...');
+                try {
+                  const result = await invoke<string>('calculate_missing_hashes');
+                  setImportMessage(`✅ ${result}`);
+                } catch (error) {
+                  console.error('Failed to index collection:', error);
+                  setImportMessage(`❌ Error: ${error}`);
+                }
+              }}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+            >
+              ⚡ Index Collection for Offline Use
+            </button>
+            {importMessage && <p className="mt-2 text-sm font-medium text-gray-700">{importMessage}</p>}
+          </div>
+        </div>
+      </section>
+
+      {/* Data Management */}
       <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Database Management</h2>
 

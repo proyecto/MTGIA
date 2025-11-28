@@ -28,6 +28,7 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
             image_uri TEXT,
             language TEXT DEFAULT 'English',
             finish TEXT DEFAULT 'nonfoil',
+            phash TEXT,
             FOREIGN KEY(set_code) REFERENCES sets(code)
         )",
         [],
@@ -138,6 +139,32 @@ pub fn migrate_database(conn: &Connection) -> Result<()> {
         }
         Err(e) => {
             println!("Migration check for finish failed: {}", e);
+        }
+    }
+
+    // Check if phash column exists, if not add it
+    let phash_column_exists: Result<i32> = conn.query_row(
+        "SELECT COUNT(*) FROM pragma_table_info('cards') WHERE name='phash'",
+        [],
+        |row| row.get(0),
+    );
+
+    match phash_column_exists {
+        Ok(0) => {
+            // Column doesn't exist, add it
+            // We store phash as TEXT (hex string) to avoid signed/unsigned issues with SQLite INTEGER
+            conn.execute(
+                "ALTER TABLE cards ADD COLUMN phash TEXT",
+                [],
+            )?;
+            println!("Migration: Added 'phash' column to cards table");
+        }
+        Ok(_) => {
+            // Column already exists
+            println!("Migration: 'phash' column already exists");
+        }
+        Err(e) => {
+            println!("Migration check for phash failed: {}", e);
         }
     }
 
