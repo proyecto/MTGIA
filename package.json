@@ -10,7 +10,11 @@
     "tauri": "tauri",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "android:init": "npm run tauri android init",
+    "android:dev": "npm run tauri android dev",
+    "android:build": "npm run tauri android build",
+    "android:build:release": "npm run tauri android build --release"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
