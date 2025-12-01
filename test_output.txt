@@ -1661,3 +1661,273 @@ Ignored nodes: comments, script, style
 
 [1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
        [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mpackage.json [22m[39m
+
+ [32m✓[39m src/components/__tests__/StatisticsModal.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 142[2mms[22m[39m
+ [32m✓[39m src/components/__tests__/EditCardModal.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 195[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/CardDetailsModal.test.tsx[2m > [22m[2mCardDetailsModal[2m > [22m[2mrenders card details correctly
+[22m[39mFailed to fetch languages: TypeError: Cannot read properties of undefined (reading 'length')
+    at fetchLanguages [90m(/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/CardDetailsModal.tsx:75:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/__tests__/CardDetailsModal.test.tsx[2m > [22m[2mCardDetailsModal[2m > [22m[2mswitches between Collection and Wishlist tabs
+[22m[39mFailed to fetch languages: TypeError: Cannot read properties of undefined (reading 'length')
+    at fetchLanguages [90m(/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/CardDetailsModal.tsx:75:23[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CardDetailsModal inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+Not implemented: Window's alert() method
+Not implemented: Window's alert() method
+ [32m✓[39m src/components/__tests__/CardDetailsModal.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 107[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/ProfitabilityReport.test.tsx[2m > [22m[2mProfitabilityReport[2m > [22m[2mdisplays error message when fetch fails
+[22m[39mFailed to fetch collection stats: Error: Failed to fetch
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/__tests__/ProfitabilityReport.test.tsx:68:38
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2msearches for cards
+[22m[39mFrontend searching: "Test" Page: 1
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2msearches for cards
+[22m[39mSearch response: {
+  data: [
+    {
+      id: [32m'test-id-1'[39m,
+      name: [32m'Test Card 1'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'1'[39m,
+      rarity: [32m'common'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-1'[39m
+    },
+    {
+      id: [32m'test-id-2'[39m,
+      name: [32m'Test Card 2'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'2'[39m,
+      rarity: [32m'rare'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-2'[39m
+    }
+  ],
+  has_more: [33mfalse[39m,
+  total_cards: [33m2[39m
+}
+
+Not implemented: navigation to another Document
+ [32m✓[39m src/components/__tests__/ProfitabilityReport.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/ScannerModal.test.tsx[2m > [22m[2mScannerModal[2m > [22m[2mrenders file upload mode when camera access is denied
+[22m[39mCamera access denied: Error: Permission denied
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/__tests__/ScannerModal.test.tsx:92:44
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+[90mstdout[2m | src/components/__tests__/ScannerModal.test.tsx[2m > [22m[2mScannerModal[2m > [22m[2mscans and searches for a card using camera
+[22m[39mDetected features: {}
+Search query: 
+
+[90mstdout[2m | src/components/__tests__/ScannerModal.test.tsx[2m > [22m[2mScannerModal[2m > [22m[2mhandles file upload and scans the image
+[22m[39mDetected features: {}
+Search query: 
+
+ [32m✓[39m src/components/__tests__/ScannerModal.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/TagManager.test.tsx[2m > [22m[2mTagManager[2m > [22m[2mcloses the modal
+[22m[39mAn update to TagManager inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/__tests__/TagManager.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+[90mstderr[2m | src/pages/__tests__/MarketTrends.test.tsx[2m > [22m[2mMarketTrends[2m > [22m[2mhandles fetch error
+[22m[39mFailed to fetch market trends: Error: Failed to fetch
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/pages/__tests__/MarketTrends.test.tsx:89:45
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+ [32m✓[39m src/pages/__tests__/MarketTrends.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 60[2mms[22m[39m
+[90mstderr[2m | src/components/__tests__/CardPriceHistoryChart.test.tsx[2m > [22m[2mCardPriceHistoryChart[2m > [22m[2mdisplays error message when fetch fails
+[22m[39mFailed to fetch price history: Error: Failed to fetch
+    at [90m/Users/rafaelruiz/Documents/proyectos/MTGIA/[39msrc/components/__tests__/CardPriceHistoryChart.test.tsx:48:38
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:912:26
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1237:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1203:10[90m)[39m
+    at [90mfile:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:37
+    at Traces.$ [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4mvitest[24m/dist/chunks/test.DqQZzsWf.js:234:21[90m)[39m
+    at runTest [90m(file:///Users/rafaelruiz/Documents/proyectos/MTGIA/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1647:12[90m)[39m
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mFrontend searching: "Test" Page: 1
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mSearch response: {
+  data: [
+    {
+      id: [32m'test-id-1'[39m,
+      name: [32m'Test Card 1'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'1'[39m,
+      rarity: [32m'common'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-1'[39m
+    },
+    {
+      id: [32m'test-id-2'[39m,
+      name: [32m'Test Card 2'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'2'[39m,
+      rarity: [32m'rare'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-2'[39m
+    }
+  ],
+  has_more: [33mfalse[39m,
+  total_cards: [33m2[39m
+}
+
+ [32m✓[39m src/components/__tests__/CardPriceHistoryChart.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 63[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mFetching languages for: Test Card 1 Oracle ID: oracle-id-1 Set: tst
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2mselects a card and fetches languages
+[22m[39mReceived languages: [ [32m'en'[39m, [32m'fr'[39m ]
+
+ [32m✓[39m src/components/__tests__/TagSelector.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/Wishlist.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/AllSets.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mFrontend searching: "Test" Page: 1
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mSearch response: {
+  data: [
+    {
+      id: [32m'test-id-1'[39m,
+      name: [32m'Test Card 1'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'1'[39m,
+      rarity: [32m'common'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-1'[39m
+    },
+    {
+      id: [32m'test-id-2'[39m,
+      name: [32m'Test Card 2'[39m,
+      set: [32m'tst'[39m,
+      set_name: [32m'Test Set'[39m,
+      collector_number: [32m'2'[39m,
+      rarity: [32m'rare'[39m,
+      image_uris: [36m[Object][39m,
+      prices: [36m[Object][39m,
+      oracle_id: [32m'oracle-id-2'[39m
+    }
+  ],
+  has_more: [33mfalse[39m,
+  total_cards: [33m2[39m
+}
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mFetching languages for: Test Card 1 Oracle ID: oracle-id-1 Set: tst
+
+[90mstdout[2m | src/components/__tests__/SearchModal.test.tsx[2m > [22m[2mSearchModal[2m > [22m[2madds a card to collection
+[22m[39mReceived languages: [ [32m'en'[39m ]
+
+ [32m✓[39m src/components/__tests__/SearchModal.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1585[2mms[22m[39m
+     [33m[2m✓[22m[39m searches for cards [33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m selects a card and fetches languages [33m 522[2mms[22m[39m
+     [33m[2m✓[22m[39m adds a card to collection [33m 523[2mms[22m[39m
+[90mstdout[2m | src/pages/__tests__/Collection.test.tsx[2m > [22m[2mCollection Page[2m > [22m[2mopens delete confirmation dialog
+[22m[39mDelete button clicked for card: 1
+
+ [32m✓[39m src/pages/__tests__/Collection.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 3100[2mms[22m[39m
+     [33m[2m✓[22m[39m renders collection header and stats [33m 533[2mms[22m[39m
+     [33m[2m✓[22m[39m displays cards in grid [33m 509[2mms[22m[39m
+     [33m[2m✓[22m[39m filters cards by name [33m 1027[2mms[22m[39m
+     [33m[2m✓[22m[39m opens delete confirmation dialog [33m 513[2mms[22m[39m
+     [33m[2m✓[22m[39m opens card details modal on click [33m 517[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m13 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+[2m   Start at [22m 10:46:41
+[2m   Duration [22m 7.29s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
