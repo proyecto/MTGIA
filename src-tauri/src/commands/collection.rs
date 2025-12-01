@@ -557,9 +557,20 @@ pub async fn import_collection(
 /// Background task to calculate pHashes for cards that don't have them.
 /// Downloads the image, calculates dHash, and updates the database.
 #[tauri::command]
-pub async fn calculate_missing_hashes(state: State<'_, AppState>) -> Result<String, String> {
+pub async fn calculate_missing_hashes(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>
+) -> Result<String, String> {
     use crate::card_features::calculate_phash;
     use image::load_from_memory;
+    use tauri::Emitter;
+
+    #[derive(Clone, serde::Serialize)]
+    struct ProgressPayload {
+        current: usize,
+        total: usize,
+        message: String,
+    }
     
     // 1. Get all cards without phash
     let cards_to_process = {
@@ -589,13 +600,26 @@ pub async fn calculate_missing_hashes(state: State<'_, AppState>) -> Result<Stri
         return Ok("No cards need indexing".to_string());
     }
     
-    println!("Found {} cards to index", cards_to_process.len());
+    let total = cards_to_process.len();
+    println!("Found {} cards to index", total);
     
     let client = reqwest::Client::new();
     let mut success_count = 0;
     let mut fail_count = 0;
     
-    for (id, name, url) in cards_to_process {
+    for (i, (id, name, url)) in cards_to_process.into_iter().enumerate() {
+        // Emit progress
+        if i % 5 == 0 || i == total - 1 {
+            let _ = app.emit(
+                "import-progress",
+                ProgressPayload {
+                    current: i + 1,
+                    total,
+                    message: format!("Indexing: {}", name),
+                },
+            );
+        }
+
         // Download image
         match client.get(&url).send().await {
             Ok(resp) => {

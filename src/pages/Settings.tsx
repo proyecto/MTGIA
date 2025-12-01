@@ -182,6 +182,22 @@ export default function Settings() {
               ⚡ Index Collection for Offline Use
             </button>
             {importMessage && <p className="mt-2 text-sm font-medium text-gray-700">{importMessage}</p>}
+
+            {/* Reuse progress bar if message contains "Indexing" */}
+            {progress && importMessage.includes('Indexing') && (
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>{progress.message}</span>
+                  <span>{Math.round((progress.current / progress.total) * 100)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-accent-blue h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(progress.current / progress.total) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

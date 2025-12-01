@@ -47,7 +47,7 @@ async fn recognize_card_with_features(
     let user_image = image::load_from_memory(&image_bytes)
         .map_err(|e| format!("Failed to load image for hashing: {}", e))?;
     let user_hash = crate::card_features::calculate_phash(&user_image);
-    let user_hash_str = format!("{:x}", user_hash);
+
     
     // Check local DB for matches
     let local_match = {
