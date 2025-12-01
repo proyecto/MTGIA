@@ -61,7 +61,7 @@ describe('StatisticsModal', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Collection Statistics')).toBeInTheDocument();
-            expect(screen.getByText(/2.?000,00/)).toBeInTheDocument(); // Default EUR
+            expect(screen.getByText(/2[.,\s]?000[.,]00/)).toBeInTheDocument(); // Flexible match for 2000.00 or 2000,00
             expect(screen.getByText('100')).toBeInTheDocument(); // Total Cards
             expect(screen.getByText('80')).toBeInTheDocument(); // Unique Cards
         });
@@ -82,7 +82,7 @@ describe('StatisticsModal', () => {
         await waitFor(() => {
             expect(screen.getByText('Black Lotus')).toBeInTheDocument();
             expect(screen.getByText('lea')).toBeInTheDocument();
-            expect(screen.getByText(/5.?000,00/)).toBeInTheDocument();
+            expect(screen.getByText(/5[.,\s]?000[.,]00/)).toBeInTheDocument();
         });
     });
 

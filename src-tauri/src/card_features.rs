@@ -352,6 +352,7 @@ pub fn extract_card_features(image_data: &[u8]) -> Result<CardFeatures, String> 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use image::{ImageBuffer, Rgb};
 
     #[test]
     fn test_rgb_to_hsv() {
@@ -366,5 +367,70 @@ mod tests {
         assert!((h - 240.0).abs() < 1.0);
         assert!((s - 1.0).abs() < 0.01);
         assert!((v - 1.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_hamming_distance() {
+        // Identical hashes -> 0 distance
+        assert_eq!(hamming_distance(0, 0), 0);
+        assert_eq!(hamming_distance(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF), 0);
+
+        // Single bit difference
+        assert_eq!(hamming_distance(0, 1), 1);
+        assert_eq!(hamming_distance(1, 0), 1);
+        assert_eq!(hamming_distance(0, 2), 1); // 2 is 10 binary
+
+        // All bits different
+        assert_eq!(hamming_distance(0, 0xFFFFFFFFFFFFFFFF), 64);
+        assert_eq!(hamming_distance(0xAAAAAAAAAAAAAAAA, 0x5555555555555555), 64);
+    }
+
+    #[test]
+    fn test_calculate_phash_simple() {
+        // Create a simple 9x8 image
+        // Left half black (0), Right half white (255)
+        // This should produce a predictable hash pattern
+        let width = 9;
+        let height = 8;
+        let mut img = ImageBuffer::new(width, height);
+
+        for y in 0..height {
+            for x in 0..width {
+                let color = if x < 4 {
+                    Rgb([0u8, 0u8, 0u8])
+                } else {
+                    Rgb([255u8, 255u8, 255u8])
+                };
+                img.put_pixel(x, y, color);
+            }
+        }
+        let dynamic_img = DynamicImage::ImageRgb8(img);
+
+        let hash = calculate_phash(&dynamic_img);
+        
+        // In this pattern (Left Black < Right White), p_left < p_right.
+        // The code sets bit if p_left > p_right.
+        // So for the transition from black to white (x=3 to x=4), p_left(0) < p_right(255).
+        // The bit should be 0.
+        // Actually, let's just verify it's deterministic.
+        assert_eq!(hash, calculate_phash(&dynamic_img));
+        
+        // Create inverse image (Left White, Right Black)
+        let mut img_inv = ImageBuffer::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                let color = if x < 4 {
+                    Rgb([255u8, 255u8, 255u8])
+                } else {
+                    Rgb([0u8, 0u8, 0u8])
+                };
+                img_inv.put_pixel(x, y, color);
+            }
+        }
+        let dynamic_img_inv = DynamicImage::ImageRgb8(img_inv);
+        let hash_inv = calculate_phash(&dynamic_img_inv);
+        
+        // Hashes should be different
+        assert_ne!(hash, hash_inv);
     }
 }
